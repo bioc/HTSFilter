@@ -1,0 +1,33 @@
+            
+                RELEASE HISTORY OF HTSFilter PACKAGE
+             ========================================
+
+		CHANGES in HTSFilter VERSION 0.99.1
+
+-- Vignette updated
+-- New method HTSBasicFilter for all classes handled by HTSFilter
+-- Made normalizeData a visible function
+-- Changes to dependencies (include classes and methods for DESeq, include
+additional classes for edgeR pipeline: DGEExact, DGEGLM, DGELRT)
+-- Slight changes/additions to man pages and citation info (paper in revision)
+-- Inclusion of methods for CountDataSet S4 objects
+-- Inclusion of methods for additional edgeR objects: DGEList, DGEExact,
+DGEGLM, and DGELRT now supported
+-- Minor change in .perConditionSimilarityIndex() to use mean rather than sum
+(in case of unbalanced experiments)
+
+		CHANGES in HTSFilter VERSION 0.99.0
+
+-- Version bumped for submission to Bioconductor.
+
+		CHANGES in HTSFilter VERSION 0.1.1
+
+-- Some additional documentation about the HTSFilter output
+-- Small changes to vignette: typos, name changed to HTSFilter.pdf to 
+   allow calls to vignette("HTSFilter"), added .onAttach function to
+   zzz.R to add HTSFilter vignette to Windows toolbar.
+-- Added HTSFilter method for signature "data.frame"
+
+		CHANGES in HTSFilter VERSION 0.1.0
+
+This is the first release (29 October 2012).

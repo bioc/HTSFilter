@@ -1,0 +1,76 @@
+\name{HTSFilter-package}
+\alias{HTSFilter-package}
+\docType{package}
+\title{
+Filter replicated transcriptome sequencing expression data
+}
+\description{
+This package implements a filtering procedure for replicated
+transcriptome sequencing data based on a global Jaccard similarity index in 
+order to identify genes with low, constant levels of expression across one or 
+more experimental conditions.
+}
+\details{
+\tabular{ll}{
+Package: \tab HTSFilter\cr
+Type: \tab Package\cr
+Version: \tab 0.99.1\cr
+Date: \tab 2013-01-17\cr
+License: \tab Artistic-2.0\cr
+}
+}
+\author{
+Andrea Rau, Melina Gallopin, Gilles Celeux, and Florence Jaffrezic
+
+Maintainer: Andrea Rau <andrea.rau@jouy.inra.fr>
+}
+\references{
+
+R. Bourgon, R. Gentleman, and W. Huber. (2010) Independent filtering increases detection power for high-
+throughput experiments. \emph{PNAS} \bold{107}(21):9546-9551.
+
+P. Jaccard (1901). Etude comparative de la distribution orale dans une portion des Alpes et des Jura.
+\emph{Bulletin de la Societe Vaudoise des Sciences Naturelles}, \bold{37}:547-549.
+
+A. Rau, M. Gallopin, G. Celeux, F. Jaffrezic (2013). Independent data-based filtering 
+for replicated transcriptome sequencing experiments. (In revision).
+
+}
+\keyword{ package }
+\examples{
+
+data("sultan")
+conds <- pData(sultan)$cell.line
+
+########################################################################
+## Matrix or data.frame
+########################################################################
+
+filter <- HTSFilter(exprs(sultan), conds, s.len=25, plot=FALSE)
+
+
+########################################################################
+## CountDataSet
+########################################################################
+
+cds <- newCountDataSet(exprs(sultan), conds)
+cds <- estimateSizeFactors(cds)
+cds <- estimateDispersions(cds)
+cds <- HTSFilter(cds, s.len=25, plot=FALSE)$filteredData
+class(cds)
+## res <- nbinomTest(cds, levels(conds)[1], levels(conds)[2])
+
+
+########################################################################
+## DGEExact
+########################################################################
+
+dge <- DGEList(counts=exprs(sultan), group=conds)
+dge <- calcNormFactors(dge)
+dge <- estimateCommonDisp(dge)
+dge <- estimateTagwiseDisp(dge)
+et <- exactTest(dge)
+et <- HTSFilter(et, DGEList=dge, s.len=25, plot=FALSE)$filteredData
+## topTags(et)
+
+}
