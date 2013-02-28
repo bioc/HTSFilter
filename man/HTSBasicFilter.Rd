@@ -47,9 +47,8 @@ a \code{DGEGLM} object, or a \code{DGELRT} object.
 }
   \item{method}{
 Basic filtering method to be used: \dQuote{mean}, \dQuote{sum}, \dQuote{rpkm}, \dQuote{variance}, 
-\dQuote{cpm}, \dQuote{number}, \dQuote{quantile}, \dQuote{max}, \dQuote{cpm.mean}, \dQuote{cpm.sum}, 
-\dQuote{cpm.variance}, \dQuote{cpm.max}, \dQuote{rpkm.mean}, \dQuote{rpkm.sum}, \dQuote{rpkm.variance}, or
-\dQuote{rpkm.max}
+\dQuote{cpm}, \dQuote{max}, \dQuote{cpm.mean}, \dQuote{cpm.sum}, \dQuote{cpm.variance}, \dQuote{cpm.max}, 
+\dQuote{rpkm.mean}, \dQuote{rpkm.sum}, \dQuote{rpkm.variance}, or \dQuote{rpkm.max}
 }
   \item{cutoff.type}{
 Type of cutoff to be used: a numeric value indicating the number of samples to be used for filtering (when 
@@ -70,19 +69,15 @@ edgeR package, only available for objects of class \code{DGEList} and \code{DGEE
 (to be used only if user is certain no normalization is required, or if data have already been pre-normalized 
 by an alternative method)
 }
-  \item{DGEList}{
-Object of class DGEList, to be used when filtering objects of class DGEExact
-}
-  \item{DGEGLM}{
-Object of class DGEGLM, to be used when filtering objects of class DGELRT
-}
 }
 
 
 \details{
-
-Blah blah blah.
-
+This function implements a basic filter for high-throughput sequencing data for a variety of filter types:
+mean, sum, RPKM, variance, CPM, maximum, mean CPM values, the sum of CPM values, the variance of CPM values,
+maximum CPM value, mean RPKM values, the sum of RPKM values, the variance of RPKM values, or the 
+maximum RPKM value. The filtering criteria used may be for a given cutoff value, a number of genes, or a given
+quantile value.
 }
 
 \value{

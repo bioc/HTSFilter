@@ -2,6 +2,10 @@
                 RELEASE HISTORY OF HTSFilter PACKAGE
              ========================================
 
+	CHANGES in HTSFilter VERSION 0.99.2
+
+-- Small updates to vignette, fixed small bug in HTSBasicFilter function and doc
+
 		CHANGES in HTSFilter VERSION 0.99.1
 
 -- Vignette updated

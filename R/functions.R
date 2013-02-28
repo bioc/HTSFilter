@@ -95,11 +95,11 @@ function(data, conds, s.min, s.max, s.len,
 	length=NA, normalization) {
 
 	## Sanity checks
-	check <- method %in% c("mean", "sum", "rpkm", "variance", "cpm", "number",
-		"quantile", "max", "cpm.mean", "cpm.sum", "cpm.variance", "cpm.max",
+	check <- method %in% c("mean", "sum", "rpkm", "variance", "cpm",
+		"max", "cpm.mean", "cpm.sum", "cpm.variance", "cpm.max",
 		"rpkm.mean", "rpkm.sum", "rpkm.variance", "rpkm.max")
 	if(check != TRUE) stop("Only the following basic filters are currently supported:
-		mean, sum, rpkm, variance, cpm, number, quantile, max")
+		mean, sum, rpkm, variance, cpm, max")
 	if(class(cutoff.type) != "character" & class(cutoff.type) != "numeric" & 
 		length(cutoff.type) != 1)
 		stop(paste("cutoff.type must be equal to a numeric value, or one of the following:\n",
@@ -167,7 +167,18 @@ function(data, conds, s.min, s.max, s.len,
 	if(method == "cpm" | method == "rpkm") {
 		if(class(cutoff.type) == "character")
 			stop(paste("cutoff.type must be numeric.")) 
-		 on.index <- rowSums(crit>cutoff) >= cutoff.type
+		on.index <- rowSums(crit>cutoff) >= cutoff.type
+		on.index <- which(on.index == TRUE)
+	}
+
+	if(method =="rpkm.mean" | method == "rpkm.sum" | method == "rpkm.variance" |
+		method == "rpkm.max" | method == "rpkm") {
+		no.length <- which(is.na(crit) == TRUE)
+		on.index <- sort(c(on.index, no.length))	
+	}
+	if(method == "rpkm") {
+		no.length <- which(is.na(crit[,1]) == TRUE)
+		on.index <- sort(c(on.index, no.length))
 	}
 
 	## Return filter results

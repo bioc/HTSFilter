@@ -55,11 +55,6 @@ setMethod(
 	length=NA, normalization=c("DESeq", "TMM", "none")) 
  	{
  		norm <- normalization <- match.arg(normalization)
-
- 		## TO DO: WHAT TO DO IF MORE THAN ONE FACTOR?
- 		if(is.na(conds)[1] == TRUE) {
-			conds <- pData(x)[,-which(colnames(pData(x)) == "sizeFactor")];
-		}
  
 		## What if alternative normalization is desired in filter?
 		if(norm == "TMM") {
@@ -249,7 +244,6 @@ setMethod(
 
 		normalization <- match.arg(normalization)
 		data <- x$counts
-		conds <- x$samples$group
 	
 		## Run filter
 		filter <- .HTSBasicFilterBackground(data=data, method=method,
@@ -291,7 +285,6 @@ setMethod(
 
 		normalization <- match.arg(normalization)
 		data <- DGEGLM$counts
-		conds <- DGEGLM$samples$group
 	
 		## Run filter
 		filter <- .HTSBasicFilterBackground(data=data, method=method,
@@ -321,41 +314,5 @@ setMethod(
 		return(filter.results)
 	}
 )
-
-
-
-
-## SeqExpressionSet
-#setMethod(
-#	f="HTSFilter",
-#	signature = signature(x="SeqExpressionSet"),
-#	definition = function(x, conds=NA, s.min=1, s.max=200, s.len=100,
-# 		loess.span=0.3, normalization=c("TMM","DESeq","none"),
-#		plot=TRUE, plot.name=NA)
-#	{
-#		normalization <- match.arg(normalization)
-#		data <- exprs(x)
-#		## TO DO: WHAT TO DO IF MORE THAN ONE FACTOR
-# 		if(is.na(conds)[1] == TRUE) conds <- pData(x);
-# 
-#		## Run filter
-# 		filter <- .HTSFilterBackground(data=data, conds=conds, s.min=s.min,
-# 			s.max=s.max, s.len=s.len, loess.span=loess.span,
-# 			normalization=normalization, plot=plot, plot.name=plot.name)
-# 
-#		## Assign filtered data to matrix
-#		filteredData <- newSeqExpressionSet(filter$data.filter,
-# 			 phenoData = phenoData(x))
-# 
-# 		## Return various results
-# 		filter.results <- list(filteredData = filteredData,
-#			on = filter$on, s = filter$s.optimal,
-# 			indexValues = filter$index.values, normFactor = filter$norm.factor,
-# 			removedData = data[which(filter$on == 0),])
-# 
-#		return(filter.results)
-# 	}
-#)
-
 
 
