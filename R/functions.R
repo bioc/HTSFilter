@@ -89,8 +89,6 @@ function(data, conds, s.min, s.max, s.len,
 }
 
 
-
-
 .HTSBasicFilterBackground <- function(data, method, cutoff.type="value", cutoff=10, 
 	length=NA, normalization) {
 
@@ -129,12 +127,11 @@ function(data, conds, s.min, s.max, s.len,
 	}
 	if(method == "rpkm" | method == "rpkm.mean" | method == "rpkm.sum" | 
 		method == "rpkm.variance" | method == "rpkm.max") {
-		if(is.na(length) == TRUE | length(length) != nrow(x)) 
+		if(is.vector(length) == FALSE | length(length) != nrow(x)) 
 			stop(paste("length needed for rpkm filter"))
 		if(normalization != "TMM") message("Note that TC normalization is used for rpkm filter.")
 		dge <- DGEList(counts=x)
-		dge <- calcNormFactors(dge)
-		crit <- .rpkm(dge, normalized.lib.sizes=FALSE)
+		crit <- .rpkm(dge, length, normalized.lib.sizes=FALSE)
 		if(method == "rpkm.mean") crit <- apply(crit, 1, mean)
 		if(method == "rpkm.sum") crit <- apply(crit, 1, sum)
 		if(method == "rpkm.variance") crit <- apply(crit, 1, var)
@@ -146,7 +143,6 @@ function(data, conds, s.min, s.max, s.len,
 		method == "cpm.mean" | method == "cpm.sum" | method == "cpm.variance" | 
 		method == "cpm.max" | method == "rpkm.mean" | method == "rpkm.sum" | 
 		method == "rpkm.variance" | method == "rpkm.max") {
-
 		if(class(cutoff.type) == "numeric")
 			stop(paste("cutoff.type must be equal to one of the following:\n",
 			dQuote("value"), dQuote("number"), dQuote("quantile")))  
@@ -159,38 +155,37 @@ function(data, conds, s.min, s.max, s.len,
 			on.index <- which(o <= cutoff)
 		}
 		if(cutoff.type == "quantile") {
-			q <- quantile(crit, cutoff)
+			q <- quantile(crit, cutoff, na.rm=TRUE)
 			on.index <- which(crit > q)
 		}
 	}
-
 	if(method == "cpm" | method == "rpkm") {
 		if(class(cutoff.type) == "character")
 			stop(paste("cutoff.type must be numeric.")) 
 		on.index <- rowSums(crit>cutoff) >= cutoff.type
 		on.index <- which(on.index == TRUE)
 	}
-
 	if(method =="rpkm.mean" | method == "rpkm.sum" | method == "rpkm.variance" |
-		method == "rpkm.max" | method == "rpkm") {
+		method == "rpkm.max") {
 		no.length <- which(is.na(crit) == TRUE)
 		on.index <- sort(c(on.index, no.length))	
 	}
 	if(method == "rpkm") {
 		no.length <- which(is.na(crit[,1]) == TRUE)
-		on.index <- sort(c(on.index, no.length))
+		on.index <- sort(c(on.index, no.length))	
 	}
 
 	## Return filter results
 	filteredData <- x; removedData <- NA;
 	if(length(on.index) > 0) filteredData <- x[on.index,]
 	if(length(on.index) < nrow(x)) removedData <- x[-on.index,]
-	on <- 0; on[on.index] <- 1
+	on <- rep(0, length(on.index)); on[on.index] <- 1
 	filter.results <- list(filteredData =  filteredData,
 		on = on, normFactor = norm.factor, removedData = removedData, 
 		filterCrit = crit)
 	return(filter.results)
 } 
+
 
 ## RPKM function taken from edgeR version 3.1.3
 .rpkm <- function (x, gene.length, normalized.lib.sizes = TRUE, log = FALSE, 
