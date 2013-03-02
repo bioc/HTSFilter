@@ -119,7 +119,7 @@ function(data, conds, s.min, s.max, s.len,
 		if(normalization != "TMM") message("Note that TMM normalization is used for cpm filter.")
 		dge <- DGEList(counts=x)
 		dge <- calcNormFactors(dge)
-		crit <- cpm(dge)
+		crit <- .cpmDGEList(dge, normalized.lib.sizes=TRUE, log=FALSE, prior.count=0.25)
 		if(method == "cpm.mean") crit <- apply(crit, 1, mean)
 		if(method == "cpm.sum") crit <- apply(crit, 1, sum)
 		if(method == "cpm.variance") crit <- apply(crit, 1, var)
@@ -131,7 +131,8 @@ function(data, conds, s.min, s.max, s.len,
 			stop(paste("length needed for rpkm filter"))
 		if(normalization != "TMM") message("Note that TC normalization is used for rpkm filter.")
 		dge <- DGEList(counts=x)
-		crit <- .rpkm(dge, length, normalized.lib.sizes=FALSE)
+		dge <- calcNormFactors(dge)
+		crit <- .rpkmDGEList(dge, length, normalized.lib.sizes=TRUE, log=FALSE, prior.count=0.25)
 		if(method == "rpkm.mean") crit <- apply(crit, 1, mean)
 		if(method == "rpkm.sum") crit <- apply(crit, 1, sum)
 		if(method == "rpkm.variance") crit <- apply(crit, 1, var)
@@ -188,12 +189,35 @@ function(data, conds, s.min, s.max, s.len,
 
 
 ## RPKM function taken from edgeR version 3.1.3
-.rpkm <- function (x, gene.length, normalized.lib.sizes = TRUE, log = FALSE, 
+.rpkmDGEList <- function(x, gene.length, normalized.lib.sizes=TRUE, log=FALSE, 
     prior.count = 0.25) 
 {
-    y <- cpm(x, normalized.lib.sizes = normalized.lib.sizes, 
-        log = log, prior.count = prior.count)
+    y <- .cpmDGEList(x, normalized.lib.sizes=normalized.lib.sizes, 
+        log=log, prior.count = prior.count)
     if (log) 
         y - log2(gene.length) + log2(1000)
     else y/(gene.length/1000)
+}
+
+## CPM functions taken from edgeR version 3.1.3
+.cpmDGEList <- function (x, normalized.lib.sizes=TRUE, log=FALSE, prior.count=0.25) 
+{
+    lib.size <- x$samples$lib.size
+    if (normalized.lib.sizes) 
+        lib.size <- lib.size * x$samples$norm.factors
+    .cpm(x$counts, lib.size=lib.size, log=log, prior.count=prior.count)
+}
+.cpm <- function (x, lib.size=NULL, log=FALSE, prior.count=0.25) 
+{
+    x <- as.matrix(x)
+    if (is.null(lib.size)) 
+        lib.size <- colSums(x)
+    if (log) {
+        prior.count.scaled <- lib.size/mean(lib.size) * prior.count
+        lib.size <- lib.size + prior.count.scaled
+    }
+    lib.size <- 1e-06 * lib.size
+    if (log) 
+        log2(t((t(x) + prior.count.scaled)/lib.size))
+    else t(t(x)/lib.size)
 }

@@ -14,8 +14,8 @@ more experimental conditions.
 \tabular{ll}{
 Package: \tab HTSFilter\cr
 Type: \tab Package\cr
-Version: \tab 0.99.3\cr
-Date: \tab 2013-03-01\cr
+Version: \tab 0.99.4\cr
+Date: \tab 2013-03-02\cr
 License: \tab Artistic-2.0\cr
 }
 }

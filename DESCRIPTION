@@ -1,8 +1,8 @@
 Package: HTSFilter
 Type: Package
 Title: Filter replicated high-throughput sequencing expression data
-Version: 0.99.3
-Date: 2013-03-01
+Version: 0.99.4
+Date: 2013-03-02
 Author: Andrea Rau, Melina Gallopin, Gilles Celeux, and Florence Jaffrezic
 Maintainer: Andrea Rau <andrea.rau@jouy.inra.fr>
 Depends: methods, edgeR (>= 2.6.12), DESeq (>= 1.8.3), Biobase (>= 2.16.0)

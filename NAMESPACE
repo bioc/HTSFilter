@@ -14,7 +14,7 @@ importMethodsFrom(DESeq, counts, conditions)
 #importMethodsFrom(EDASeq, exprs)
 
 ## import methods
-importFrom(edgeR, calcNormFactors, cpm)
+importFrom(edgeR, calcNormFactors)
 importFrom(DESeq, estimateSizeFactorsForMatrix, newCountDataSet)
 #importFrom(EDASeq, newSeqExpressionSet)
 
