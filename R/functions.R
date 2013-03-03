@@ -180,7 +180,7 @@ function(data, conds, s.min, s.max, s.len,
 	filteredData <- x; removedData <- NA;
 	if(length(on.index) > 0) filteredData <- x[on.index,]
 	if(length(on.index) < nrow(x)) removedData <- x[-on.index,]
-	on <- rep(0, length(on.index)); on[on.index] <- 1
+	on <- rep(0, nrow(x)); on[on.index] <- 1
 	filter.results <- list(filteredData =  filteredData,
 		on = on, normFactor = norm.factor, removedData = removedData, 
 		filterCrit = crit)
