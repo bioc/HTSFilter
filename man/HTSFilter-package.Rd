@@ -2,7 +2,7 @@
 \alias{HTSFilter-package}
 \docType{package}
 \title{
-Filter replicated transcriptome sequencing expression data
+Filter replicated transcriptome transcriptome sequencing data
 }
 \description{
 This package implements a filtering procedure for replicated
@@ -14,8 +14,8 @@ more experimental conditions.
 \tabular{ll}{
 Package: \tab HTSFilter\cr
 Type: \tab Package\cr
-Version: \tab 0.99.4\cr
-Date: \tab 2013-03-02\cr
+Version: \tab 0.99.5\cr
+Date: \tab 2013-03-03\cr
 License: \tab Artistic-2.0\cr
 }
 }

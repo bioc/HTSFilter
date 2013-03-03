@@ -129,7 +129,7 @@ function(data, conds, s.min, s.max, s.len,
 		method == "rpkm.variance" | method == "rpkm.max") {
 		if(is.vector(length) == FALSE | length(length) != nrow(x)) 
 			stop(paste("length needed for rpkm filter"))
-		if(normalization != "TMM") message("Note that TC normalization is used for rpkm filter.")
+		if(normalization != "TMM") message("Note that TMM normalization is used for rpkm filter.")
 		dge <- DGEList(counts=x)
 		dge <- calcNormFactors(dge)
 		crit <- .rpkmDGEList(dge, length, normalized.lib.sizes=TRUE, log=FALSE, prior.count=0.25)
