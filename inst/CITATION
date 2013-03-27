@@ -1,12 +1,12 @@
 citHeader("To cite the R package 'HTSFilter' in publications use:")  
 
 citEntry(entry   = "Article",
-         title   = "Independent data-based filtering for replicated transcriptome sequencing experiments",
+         title   = "Independent data-based filtering for replicated high-throughput transcriptome sequencing experiments",
          year    = "2013",
-	 journal = "(in revision)",
+	 journal = "(submitted)",
          author  = personList(
            person(first="Andrea", last="Rau"),
            person(first="Melina", last="Gallopin"),
            person(first="Gilles", last="Celeux"),
            person(first="Florence", last="Jaffrezic")),
-         textVersion = "A. Rau, M. Gallopin, G. Celeux, F. Jaffrezic (2013). Independent data-based filtering for replicated transcriptome sequencing experiments.")
+         textVersion = "A. Rau, M. Gallopin, G. Celeux, F. Jaffrezic (2013). Independent data-based filtering for replicated high-throughput transcriptome sequencing experiments.")

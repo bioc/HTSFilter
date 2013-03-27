@@ -101,8 +101,8 @@ normalization method specified in \code{normalization}}
 R. Bourgon, R. Gentleman, and W. Huber. (2010) Independent filtering increases detection power for high-
 throughput experiments. \emph{PNAS} \bold{107}(21):9546-9551.
 
-A. Rau, M. Gallopin, G. Celeux, F. Jaffrezic (2012). Independent data-based filtering 
-for replicated high-throughput sequencing experiments. (Manuscript in progress).
+A. Rau, M. Gallopin, G. Celeux, F. Jaffrezic (2013). Independent data-based filtering 
+for replicated high-throughput transcriptome sequencing experiments (submitted).
 
 }
 \author{

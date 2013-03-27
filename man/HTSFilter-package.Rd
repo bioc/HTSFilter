@@ -14,8 +14,8 @@ more experimental conditions.
 \tabular{ll}{
 Package: \tab HTSFilter\cr
 Type: \tab Package\cr
-Version: \tab 0.99.6\cr
-Date: \tab 2013-03-03\cr
+Version: \tab 0.99.7\cr
+Date: \tab 2013-03-27\cr
 License: \tab Artistic-2.0\cr
 }
 }
@@ -33,7 +33,7 @@ P. Jaccard (1901). Etude comparative de la distribution orale dans une portion 
 \emph{Bulletin de la Societe Vaudoise des Sciences Naturelles}, \bold{37}:547-549.
 
 A. Rau, M. Gallopin, G. Celeux, F. Jaffrezic (2013). Independent data-based filtering 
-for replicated transcriptome sequencing experiments. (In revision).
+for replicated high-throughput transcriptome sequencing experiments (submitted).
 
 }
 \keyword{ package }

@@ -2,9 +2,10 @@
                 RELEASE HISTORY OF HTSFilter PACKAGE
              ========================================
 
-	CHANGES in HTSFilter VERSION 0.99.3-0.99.5
+	CHANGES in HTSFilter VERSION 0.99.3-0.99.7
 
 -- Fixed minor bugs in HTSBasicFilter function for rpkm calculation
+-- Minor changes to vignette
 
 	CHANGES in HTSFilter VERSION 0.99.2
 

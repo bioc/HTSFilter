@@ -36,8 +36,8 @@ normalization method specified in \code{normalization}}
 S. Anders and W. Huber (2010). Differential expression analysis for sequence count data.
 \emph{Genome Biology}, 11(R106):1-28.
 
-A. Rau, M. Gallopin, G. Celeux, F. Jaffrezic (2012). Independent data-based filtering 
-for replicated high-throughput sequencing experiments. (Manuscript in progress).
+A. Rau, M. Gallopin, G. Celeux, F. Jaffrezic (2013). Independent data-based filtering 
+for replicated high-throughput transcriptome sequencing experiments (submitted).
 
 M. D. Robinson and A. Oshlack (2010). A scaling normalization method for differential expression
 analysis of RNA-seq data. \emph{Genome Biology}, 11(R25).

@@ -140,8 +140,8 @@ throughput experiments. \emph{PNAS} \bold{107}(21):9546-9551.
 P. Jaccard (1901). Etude comparative de la distribution orale dans une portion des Alpes et des Jura.
 \emph{Bulletin de la Societe Vaudoise des Sciences Naturelles}, \bold{37}:547-549.
 
-A. Rau, M. Gallopin, G. Celeux, F. Jaffrezic (2012). Independent data-based filtering 
-for replicated high-throughput sequencing experiments. (Manuscript in progress).
+A. Rau, M. Gallopin, G. Celeux, F. Jaffrezic (2013). Independent data-based filtering 
+for replicated high-throughput transcriptome sequencing experiments (submitted).
 
 }
 \author{
