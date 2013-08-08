@@ -11,11 +11,15 @@ importClassesFrom(DESeq, CountDataSet)
 
 ## import S4 methods
 importMethodsFrom(DESeq, counts, conditions)
+importMethodsFrom(DESeq2, counts)
+importMethodsFrom(IRanges, mcols)
+importMethodsFrom(GenomicRanges, colData)
 #importMethodsFrom(EDASeq, exprs)
 
 ## import methods
-importFrom(edgeR, calcNormFactors)
-importFrom(DESeq, estimateSizeFactorsForMatrix, newCountDataSet)
+importFrom(edgeR, calcNormFactors, DGEList)
+importFrom(DESeq, newCountDataSet)
+#importFrom(DESeq, estimateSizeFactorsForMatrix)
 #importFrom(EDASeq, newSeqExpressionSet)
 
 ## export methods

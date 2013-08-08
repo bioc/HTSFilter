@@ -9,6 +9,7 @@
 \alias{HTSBasicFilter,DGEGLM-method}
 \alias{HTSBasicFilter,DGELRT-method}
 \alias{HTSBasicFilter,CountDataSet-method}
+\alias{HTSBasicFilter,DESeqDataSet-method}
 \title{
 Implement basic filters for transcriptome sequencing data.
 }
@@ -37,13 +38,16 @@ This function implements a variety of basic filters for transcriptome sequencing
 
 \S4method{HTSBasicFilter}{DGELRT}(x, method, cutoff.type="value", cutoff=10, 
 	length=NA, normalization=c("TMM", "DESeq", "none"))
+
+\S4method{HTSBasicFilter}{DESeqDataSet}(x, method, cutoff.type="value", cutoff=10, 
+	length=NA, normalization=c("DESeq", "TMM", "none"))
 }
 
 \arguments{
   \item{x}{
 A numeric matrix or data.frame representing the counts of dimension (\emph{g} x \emph{n}), for \emph{g} 
 genes in \emph{n} samples, a \code{CountDataSet} object, a \code{DGEList} object, a \code{DGEExact} object, 
-a \code{DGEGLM} object, or a \code{DGELRT} object.
+a \code{DGEGLM} object, a \code{DGELRT} object, or a \code{DESeqDataSet} object.
 }
   \item{method}{
 Basic filtering method to be used: \dQuote{mean}, \dQuote{sum}, \dQuote{rpkm}, \dQuote{variance}, 
@@ -101,8 +105,9 @@ normalization method specified in \code{normalization}}
 R. Bourgon, R. Gentleman, and W. Huber. (2010) Independent filtering increases detection power for high-
 throughput experiments. \emph{PNAS} \bold{107}(21):9546-9551.
 
-A. Rau, M. Gallopin, G. Celeux, F. Jaffrezic (2013). Independent data-based filtering 
-for replicated high-throughput transcriptome sequencing experiments (submitted).
+A. Rau, M. Gallopin, G. Celeux, F. Jaffrezic (2013). Data-based filtering 
+for replicated high-throughput transcriptome sequencing experiments. \emph{Bioinformatics},
+doi: 10.1093/bioinformatics/btt350.
 
 }
 \author{
@@ -126,6 +131,7 @@ filter <- HTSBasicFilter(exprs(sultan), method="sum", cutoff.type="value",
 ## CountDataSet
 ########################################################################
 
+library(DESeq)
 ## Filter genes with mean normalized gene counts less than the 40% quantile
 cds <- newCountDataSet(exprs(sultan), conds)
 filter <- HTSBasicFilter(cds, method="mean", cutoff.type="quantile", 
@@ -136,10 +142,25 @@ filter <- HTSBasicFilter(cds, method="mean", cutoff.type="quantile",
 ## DGEExact
 ########################################################################
 
+library(edgeR)
 ## Filter genes with CPM values less than 100 in more than 2 samples
 dge <- DGEList(counts=exprs(sultan), group=conds)
 dge <- calcNormFactors(dge)
 filter <- HTSBasicFilter(dge, method="cpm", cutoff.type=2, cutoff=100)
+
+
+########################################################################
+## DESeq2
+########################################################################
+
+library(DESeq2)
+dds <- DESeqDataSetFromMatrix(countData = exprs(sultan),
+                              colData = data.frame(cell.line = conds),
+                              design = ~ cell.line)
+dds <- DESeq(dds)
+## Filter genes with mean normalized gene counts less than the 40% quantile
+filter <- HTSBasicFilter(dds, method="mean", cutoff.type="quantile", 
+	cutoff = 0.4)
 
 
 }

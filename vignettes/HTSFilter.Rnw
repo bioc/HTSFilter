@@ -33,10 +33,10 @@
 
 \begin{document}
 
-\title{HTSFilter: Independent data-based filtering for replicated transcriptome sequencing experiments
+\title{HTSFilter: Data-based filtering for replicated transcriptome sequencing experiments
 }
 \author{Andrea Rau, M{\'e}lina Gallopin, Gilles Celeux, Florence Jaffr{\'e}zic}
-\date{Modified: March 27, 2013.   Compiled: \today}
+\date{Modified: August 8, 2013.   Compiled: \today}
 \maketitle
 
 <<echo=FALSE>>=
@@ -44,7 +44,7 @@ options(width=60)
 @ 
 
 \begin{abstract}
-This vignette illustrates the use of the \Rpackage{HTSFilter} package to filter replicated data from transcriptome sequencing experiments (e.g., RNA sequencing data) for a variety of different data classes: \Rclass{matrix}, \Rclass{data.frame}, \Rclass{CountDataSet} (the S4 class associated with the \Rpackage{DESeq} package), and the S3 classes associated with the \Rpackage{edgeR} package (\Rclass{DGEList}, \Rclass{DGEExact}, \Rclass{DGEGLM}, and \Rclass{DGELRT}). 
+This vignette illustrates the use of the \Rpackage{HTSFilter} package to filter replicated data from transcriptome sequencing experiments (e.g., RNA sequencing data) for a variety of different data classes: \Rclass{matrix}, \Rclass{data.frame}, \Rclass{CountDataSet} (the S4 class associated with the \Rpackage{DESeq} package), the S3 classes associated with the \Rpackage{edgeR} package (\Rclass{DGEList}, \Rclass{DGEExact}, \Rclass{DGEGLM}, and \Rclass{DGELRT}), and the S4 class associated with the \Rpackage{DESeq2} package (\Rclass{DESeqDataSet}). 
 \end{abstract}
 
 \tableofcontents
@@ -57,16 +57,16 @@ High-throughput sequencing (HTS) data, such as RNA-sequencing (RNA-seq) data, ar
 
 Because hypothesis tests are performed for gene-by-gene differential analyses, the obtained $p$-values must be adjusted to correct for multiple testing. However, procedures to adjust $p$-values to control the number of detected false positives often lead to a loss of power to detect truly differentially expressed (DE) genes due to the large number of hypothesis tests performed. To reduce the impact of such procedures, independent data filters are often used to identify and remove genes that appear to generate an uninformative signal \cite{Bourgon2010}; this in turn moderates the correction needed to adjust for multiple testing. For independent filtering methods for microarray data, see for example the \Rpackage{genefilter} Bioconductor package \cite{Gentleman}.
 
-The \Rpackage{HTSFilter} package implements a novel independent filtering procedure based on the calculation of a similarity index among biological replicates for read counts arising from replicated transcriptome sequencing (RNA-seq) data. This technique provides an intuitive data-driven way to filter high-throughput transcriptome sequencing data and to effectively remove genes with low, constant expression levels without incorrectly removing those that would otherwise have been identified as DE. The two fundamental assumptions of the filter implemented in the \Rpackage{HTSFilter} package are as follows: 
+The \Rpackage{HTSFilter} package implements a novel data-based filtering procedure based on the calculation of a similarity index among biological replicates for read counts arising from replicated transcriptome sequencing (RNA-seq) data. This technique provides an intuitive data-driven way to filter high-throughput transcriptome sequencing data and to effectively remove genes with low, constant expression levels without incorrectly removing those that would otherwise have been identified as DE. The two fundamental assumptions of the filter implemented in the \Rpackage{HTSFilter} package are as follows: 
 \begin{enumerate}
-\item Biological replicates are present for each experimental condition,
-\item Data can be appropriately normalized (scaled) to correct for systematic inter-sample biases, and
+\item Biological replicates are present for each experimental condition, and
+\item Data can be appropriately normalized (scaled) to correct for systematic inter-sample biases.
 \end{enumerate}
 Assuming these conditions hold, \Rpackage{HTSFilter} implements a method to identify a filtering threshold that maximizes the {\it filtering similarity} among replicates, that is, one where most genes tend to either have normalized counts less than or equal to the cutoff in all samples (i.e., filtered genes) or greater than the cutoff in all samples (i.e., non-filtered genes). This filtering similarity is defined using the global Jaccard index, that is, the average Jaccard index calculated between pairs of replicates within each experimental condition; see \citet{Rau2012a} for more details.
 
 For more information about between-sample normalization strategies, see \cite{Dillies2012}; in particular, strategies for normalizing data with differences in library size and composition may be found in \cite{Anders2010} and \cite{Robinson2010}, and strategies for normalizing data exhibiting sample-specific biases due to GC content may be found in \cite{Risso2011} and \cite{Hansen2012}. Within the \Rpackage{HTSFilter} package, the Trimmed Means of M-values (TMM) \cite{Robinson2010} and DESeq \cite{Anders2010} normalization strategies may be used prior to calculating an appropriate data-based filter. If an alternative normalization strategy is needed or desired, the normalization may be applied prior to filtering the data with \texttt{normalization="none"} in the \Rfunction{HTSFilter} function; see Section~\ref{sec:EDAseqnorm} for an example.
 
-The \Rpackage{HTSFilter} package is able to accommodate unnormalized or normalized replicated count data in the form of a \Rclass{matrix} or \Rclass{data.frame} (in which each row corresponds to a biological feature and each column to a biological sample), a \Rclass{CountDataSet} (the S4 class associated with the \Rpackage{DESeq} package), or one of the S3 classes associated with the \Rpackage{edgeR} package (\Rclass{DGEList}, \Rclass{DGEExact}, \Rclass{DGEGLM}, and \Rclass{DGELRT}), as illustrated in the following sections.
+The \Rpackage{HTSFilter} package is able to accommodate unnormalized or normalized replicated count data in the form of a \Rclass{matrix} or \Rclass{data.frame} (in which each row corresponds to a biological feature and each column to a biological sample), a \Rclass{CountDataSet} (the S4 class associated with the \Rpackage{DESeq} package), one of the S3 classes associated with the \Rpackage{edgeR} package (\Rclass{DGEList}, \Rclass{DGEExact}, \Rclass{DGEGLM}, and \Rclass{DGELRT}), or \Rclass{DESeqDataSet} (the S4 class associated with the \Rpackage{DESeq2} package), as illustrated in the following sections.
 
 \begin{figure}[t!]
 \centering
@@ -80,12 +80,15 @@ Finally, we note that the filtering method implemented in the \Rpackage{HTSFilte
 \section{Input data} \label{sec:prep}
 %--------------------------------------------------
 
-For the purposes of this vignette, we make use of data from a study of sex-specific expression of liver cells in human. Sultan et al. \cite{Sultan2008} obtained a high-throughput sequencing data (using a 1G Illumina Genome Analyzer sequencing machine) from a human embryonic kidney and a B cell line, with two biological replicates each. The raw read counts and phenotype tables were obtained from the ReCount online resource \cite{Frazee2011}.
+For the purposes of this vignette, we make use of data from a study of sex-specific expression of liver cells in human and the \Rpackage{DESeq} and \Rpackage{edgeR} packages for differential analysis. Sultan et al. \cite{Sultan2008} obtained a high-throughput sequencing data (using a 1G Illumina Genome Analyzer sequencing machine) from a human embryonic kidney and a B cell line, with two biological replicates each. The raw read counts and phenotype tables were obtained from the ReCount online resource \cite{Frazee2011}.
 
 To begin, we load the \Rpackage{HTSFilter} package, and attach the gene-level count data contained in \Robject{sultan}:
 
 <<loadingPackages, fig=TRUE, include=FALSE>>=
 library(HTSFilter)
+library(DESeq)
+library(edgeR)
+library(DESeq2)
 data("sultan")
 hist(log(exprs(sultan)+1), col="grey", breaks=25, main="", 
   xlab="Log(counts+1)")
@@ -223,6 +226,30 @@ Note that the filtered data are of the class \Rclass{DGEList}, allowing for a ca
 topTags(lrt)
 @
 
+
+%--------------------------------------------------
+\section{\Rpackage{DESeq2} package pipeline: S4 class \Rclass{DESeqDataSet}} \label{sec:deseq2}
+%--------------------------------------------------
+
+The \Rpackage{HTSFilter} package allows for a straightforward integration within the \Rpackage{DESeq2} analysis pipeline, most notably allowing for $p$-values to be adjusted only for those genes passing the filter.
+
+To illustrate the application of a filter for high-throughput sequencing data in the form of a \Rclass{DESeqDataSet} (the class used within the \Rpackage{DESeq2} pipeline for differential analysis), we coerce \Robject{sultan} into an object of the class \Rclass{DESeqDataSet} using the function \Rcode{DESeqDataSetFromMatrix}. Once again, we specify that the number of tested thresholds be only 25 (\Rcode{s.len=25}) rather than the default value of 100 to reduce computation time. For objects in the form of a \Rclass{DESeqDataSet}, the default normalization strategy is \Rcode{"DESeq"}, although alternative normalization strategies may also be used.
+
+<<cds, fig=FALSE, include=FALSE>>=
+
+dds <- DESeqDataSetFromMatrix(countData = exprs(sultan),
+                              colData = data.frame(cell.line = conds),
+                              design = ~ cell.line)
+dds <- DESeq(dds)
+filter <- HTSFilter(dds, s.len=25, plot=FALSE)$filteredData
+class(filter)
+dim(filter)
+res <- results(filter)
+head(res)
+
+@
+
+As may be seen above, the filtered data remain an object of class \Rclass{DESeqDataSet}, and subsequent functions from \Rpackage{DESeq2} (such as the results summary function \Rcode{results}) may be called directly upon it.
 
 %%--------------------------------------------------
 \section{Alternative normalization using \Rpackage{EDAseq}} \label{sec:EDAseqnorm}

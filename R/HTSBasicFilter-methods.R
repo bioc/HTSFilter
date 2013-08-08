@@ -32,6 +32,9 @@ setMethod(
 	{
 		normalization <- match.arg(normalization)
 		data <- as.matrix(x)
+		if(is.character(data) == TRUE) {
+			stop("Character values detected in data.frame x.\nPlease check that ID names are not included in one of the columns.")
+		}
 
 		## Run filter
 		filter <- .HTSBasicFilterBackground(data=data, method=method,
@@ -55,6 +58,9 @@ setMethod(
 	length=NA, normalization=c("DESeq", "TMM", "none")) 
  	{
  		norm <- normalization <- match.arg(normalization)
+		if(!require(DESeq)) {
+			stop("DESeq library must be installed.")
+		}
  
 		## What if alternative normalization is desired in filter?
 		if(norm == "TMM") {
@@ -143,6 +149,9 @@ setMethod(
 	length=NA, normalization=c("TMM", "DESeq", "pseudo.counts", "none")) 
 	{
 
+		if(!require(edgeR)) {
+			stop("edgeR library must be installed.")
+		}
 		if(is.null(x$common.dispersion) == FALSE & is.null(x$tagwise.dispersion == TRUE)) {
 			stop("Filtering must be performed either before calling estimateCommonDisp, or after calling estimateTagwiseDisp.")
 		}
@@ -200,6 +209,9 @@ setMethod(
 	length=NA, normalization=c("TMM", "DESeq", "pseudo.counts", "none")) 
 	{
 
+		if(!require(edgeR)) {
+			stop("edgeR library must be installed.")
+		}
 		normalization <- match.arg(normalization)
 		data <- DGEList$counts
 		conds <- DGEList$samples$group
@@ -241,7 +253,9 @@ setMethod(
 	definition = function(x, method, cutoff.type="value", cutoff=10, 
 	length=NA, normalization=c("TMM", "DESeq", "none"))
 	{
-
+		if(!require(edgeR)) {
+			stop("edgeR library must be installed.")
+		}
 		normalization <- match.arg(normalization)
 		data <- x$counts
 	
@@ -283,6 +297,9 @@ setMethod(
 	length=NA, normalization=c("TMM", "DESeq", "none"))
 	{
 
+		if(!require(edgeR)) {
+			stop("edgeR library must be installed.")
+		}
 		normalization <- match.arg(normalization)
 		data <- DGEGLM$counts
 	
@@ -314,5 +331,64 @@ setMethod(
 		return(filter.results)
 	}
 )
+
+
+
+## DESeqDataSet
+setMethod(
+	f= "HTSBasicFilter",
+	signature = signature(x="DESeqDataSet"),
+	definition = function(x, method, cutoff.type="value", cutoff=10,
+	length=NA, normalization=c("DESeq", "TMM", "none"))
+	{
+		if(!require(DESeq2)) {
+			stop("DESeq2 library must be installed.")
+		}          
+		normalization <- match.arg(normalization)
+                data <- counts(x, normalized=FALSE)
+                if(ncol(colData(x)) > 2) {
+                  stop("HTSFilter currently only supports a single factor when working with DESeq2.")
+                }
+
+		## Run filter
+		filter <- .HTSBasicFilterBackground(data=data, method=method,
+			cutoff.type=cutoff.type, cutoff=cutoff, length=length,
+			normalization=normalization)
+		on <- filter$on
+		on.index <- which(on == 1) 
+		filteredData <- x[on.index,]
+                
+                ## Re-adjust p-values
+                nm <- strsplit(colnames(mcols(filteredData)), split="_", fixed=TRUE)
+                Waldindex <- which(unlist(lapply(nm, function(yy) yy[1]))=="WaldPvalue")
+                LRTindex <- which(unlist(lapply(nm,  function(yy) yy[1]))=="LRTPvalue")
+                message("Note: BH correction of p-values used in HTSFilter.")
+                # Wald p-values
+                if(length(Waldindex) > 0 ) {
+                  for(j in Waldindex) {
+                    look <- substr(colnames(mcols(filteredData))[j], 12, 100)
+                    find <- which(substr(colnames(mcols(filteredData)), 12+3, 100) == look)
+                    find <- find[which(find > j)]
+                    mcols(filteredData)[,find] <- p.adjust(mcols(filteredData)[,j], method="BH")
+                  }
+                }
+                # LRT p-values
+                if(length(LRTindex) > 0 ) {
+                  for(j in LRTindex) {
+                    look <- substr(colnames(mcols(filteredData))[j], 11, 100)
+                    find <- which(substr(colnames(mcols(filteredData)), 11+3, 100) == look)
+                    find <- find[which(find > j)]
+                    mcols(filteredData)[,find] <- p.adjust(mcols(filteredData)[,j], method="BH")
+                  }
+                }
+                
+		## Return various results
+		filter.results <- list(filteredData = filteredData,
+			on = filter$on, normFactor = filter$norm.factor,
+			removedData = data[which(filter$on == 0),], filterCrit = filter$filterCrit)
+		return(filter.results)
+	}
+)
+
 
 
