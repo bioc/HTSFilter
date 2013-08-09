@@ -9,6 +9,7 @@
 \alias{HTSFilter,DGEGLM-method}
 \alias{HTSFilter,DGELRT-method}
 \alias{HTSFilter,CountDataSet-method}
+\alias{HTSFilter,DESeqDataSet-method}
 \title{
 Calculate data-based filtering threshold for replicated transcriptome sequencing data.
 }
@@ -46,11 +47,15 @@ of replicates within each experimental condition.
 \S4method{HTSFilter}{DGELRT}(x, DGEGLM, s.min=1, s.max=200, s.len=100, 
      loess.span=0.3, normalization=c("TMM", "DESeq", "none"), 
      plot=TRUE, plot.name=NA)
+
+\S4method{HTSFilter}{DESeqDataSet}(x, s.min=1, s.max=200, s.len=100, 
+     loess.span=0.3, normalization=c("DESeq", "TMM", "none"), 
+     plot=TRUE, plot.name=NA)
 }
 
 \arguments{
   \item{x}{
-A numeric matrix or data.frame representing the counts of dimension (\emph{g} x \emph{n}), for \emph{g} genes in \emph{n} samples, a \code{CountDataSet} object, a \code{DGEList} object, a \code{DGEExact} object, a \code{DGEGLM} object, or a \code{DGELRT} object.
+A numeric matrix or data.frame representing the counts of dimension (\emph{g} x \emph{n}), for \emph{g} genes in \emph{n} samples, a \code{CountDataSet} object, a \code{DGEList} object, a \code{DGEExact} object, a \code{DGEGLM} object, a \code{DGELRT} object, or a \code{DESeqDataSet} object.
 }
   \item{conds}{
 Vector of length \emph{n} identifying the experimental condition of each of the \emph{n} samples; required when sQuote(x)
@@ -140,8 +145,9 @@ throughput experiments. \emph{PNAS} \bold{107}(21):9546-9551.
 P. Jaccard (1901). Etude comparative de la distribution orale dans une portion des Alpes et des Jura.
 \emph{Bulletin de la Societe Vaudoise des Sciences Naturelles}, \bold{37}:547-549.
 
-A. Rau, M. Gallopin, G. Celeux, F. Jaffrezic (2013). Independent data-based filtering 
-for replicated high-throughput transcriptome sequencing experiments (submitted).
+A. Rau, M. Gallopin, G. Celeux, F. Jaffrezic (2013). Data-based filtering 
+for replicated high-throughput transcriptome sequencing experiments. \emph{Bioinformatics},
+doi: 10.1093/bioinformatics/btt350.
 
 }
 \author{
@@ -166,6 +172,7 @@ filter <- HTSFilter(exprs(sultan), conds, s.len=25, plot=FALSE)
 ## CountDataSet
 ########################################################################
 
+library(DESeq)
 cds <- newCountDataSet(exprs(sultan), conds)
 cds <- estimateSizeFactors(cds)
 cds <- estimateDispersions(cds)
@@ -178,6 +185,7 @@ class(cds)
 ## DGEExact
 ########################################################################
 
+library(edgeR)
 dge <- DGEList(counts=exprs(sultan), group=conds)
 dge <- calcNormFactors(dge)
 dge <- estimateCommonDisp(dge)
@@ -185,6 +193,20 @@ dge <- estimateTagwiseDisp(dge)
 et <- exactTest(dge)
 et <- HTSFilter(et, DGEList=dge, s.len=25, plot=FALSE)$filteredData
 ## topTags(et)
+
+
+########################################################################
+## DESeq2
+########################################################################
+
+library(DESeq2)
+dds <- DESeqDataSetFromMatrix(countData = exprs(sultan),
+                              colData = data.frame(cell.line = conds),
+                              design = ~ cell.line)
+dds <- DESeq(dds)
+filter <- HTSFilter(dds, s.len=25, plot=FALSE)$filteredData
+class(filter)
+## res <- results(filter)
 
 
 }

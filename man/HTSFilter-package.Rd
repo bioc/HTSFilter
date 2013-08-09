@@ -14,8 +14,8 @@ more experimental conditions.
 \tabular{ll}{
 Package: \tab HTSFilter\cr
 Type: \tab Package\cr
-Version: \tab 0.99.8\cr
-Date: \tab 2013-03-29\cr
+Version: \tab 1.0.1\cr
+Date: \tab 2013-08-08\cr
 License: \tab Artistic-2.0\cr
 }
 }
@@ -32,8 +32,9 @@ throughput experiments. \emph{PNAS} \bold{107}(21):9546-9551.
 P. Jaccard (1901). Etude comparative de la distribution orale dans une portion des Alpes et des Jura.
 \emph{Bulletin de la Societe Vaudoise des Sciences Naturelles}, \bold{37}:547-549.
 
-A. Rau, M. Gallopin, G. Celeux, F. Jaffrezic (2013). Independent data-based filtering 
-for replicated high-throughput transcriptome sequencing experiments (submitted).
+A. Rau, M. Gallopin, G. Celeux, F. Jaffrezic (2013). Data-based filtering 
+for replicated high-throughput transcriptome sequencing experiments. \emph{Bioinformatics},
+doi: 10.1093/bioinformatics/btt350.
 
 }
 \keyword{ package }
@@ -53,6 +54,7 @@ filter <- HTSFilter(exprs(sultan), conds, s.len=25, plot=FALSE)
 ## CountDataSet
 ########################################################################
 
+library(DESeq)
 cds <- newCountDataSet(exprs(sultan), conds)
 cds <- estimateSizeFactors(cds)
 cds <- estimateDispersions(cds)
@@ -65,6 +67,7 @@ class(cds)
 ## DGEExact
 ########################################################################
 
+library(edgeR)
 dge <- DGEList(counts=exprs(sultan), group=conds)
 dge <- calcNormFactors(dge)
 dge <- estimateCommonDisp(dge)
@@ -72,5 +75,20 @@ dge <- estimateTagwiseDisp(dge)
 et <- exactTest(dge)
 et <- HTSFilter(et, DGEList=dge, s.len=25, plot=FALSE)$filteredData
 ## topTags(et)
+
+
+########################################################################
+## DESeq2
+########################################################################
+
+library(DESeq2)
+dds <- DESeqDataSetFromMatrix(countData = exprs(sultan),
+                              colData = data.frame(cell.line = conds),
+                              design = ~ cell.line)
+dds <- DESeq(dds)
+filter <- HTSFilter(dds, s.len=25, plot=FALSE)$filteredData
+class(filter)
+## res <- results(filter)
+
 
 }

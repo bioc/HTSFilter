@@ -36,6 +36,9 @@ setMethod(
 	{
 		normalization <- match.arg(normalization)
 		data <- as.matrix(x)
+		if(is.character(data) == TRUE) {
+			stop("Character values detected in data.frame x.\nPlease check that ID names are not included in one of the columns.")
+		}
 
 		## Run filter
 		filter <- .HTSFilterBackground(data=data, conds=conds, s.min=s.min,
@@ -62,6 +65,9 @@ setMethod(
  		plot=TRUE, plot.name=NA)
  	{
  		norm <- normalization <- match.arg(normalization)
+		if(!require(DESeq)) {
+			stop("DESeq library must be installed.")
+		}
 
  		## TO DO: WHAT TO DO IF MORE THAN ONE FACTOR?
  		if(is.na(conds)[1] == TRUE) {
@@ -154,6 +160,10 @@ setMethod(
 		plot=TRUE, plot.name=NA)
 	{
 
+		if(!require(edgeR)) {
+			stop("edgeR library must be installed.")
+		}
+
 		if(is.null(x$common.dispersion) == FALSE & is.null(x$tagwise.dispersion == TRUE)) {
 			stop("Filtering must be performed either before calling estimateCommonDisp, or after calling estimateTagwiseDisp.")
 		}
@@ -183,6 +193,11 @@ setMethod(
 		filteredData$pseudo.counts <- x$pseudo.counts[on.index,]
 		filteredData$logCPM <- x$logCPM[on.index]
 		filteredData$tagwise.dispersion <- x$tagwise.dispersion[on.index]
+		## Added August 8, 2013: thanks to Marie-Laure Endale for catching this one!
+		filteredData$genes <- x$genes[on.index]
+		filteredData$AveLogCPM <- x$AveLogCPM[on.index]
+		filteredData$trended.dispersion <- x$trended.dispersion[on.index]
+		filteredData$offset <- x$offset[on.index,]
 
 		## Reset library sizes if filtering before estimating dispersion parameters 
 		if(is.null(x$common.dispersion) == TRUE) {
@@ -213,6 +228,9 @@ setMethod(
 		plot=TRUE, plot.name=NA)
 	{
 
+		if(!require(edgeR)) {
+			stop("edgeR library must be installed.")
+		}
 		normalization <- match.arg(normalization)
 		data <- DGEList$counts
 		conds <- DGEList$samples$group
@@ -259,6 +277,9 @@ setMethod(
 		plot=TRUE, plot.name=NA)
 	{
 
+		if(!require(edgeR)) {
+			stop("edgeR library must be installed.")
+		}
 		normalization <- match.arg(normalization)
 		data <- x$counts
 		conds <- x$samples$group
@@ -282,6 +303,8 @@ setMethod(
 		filteredData$fitted.values <- x$fitted.values[on.index,]
 		filteredData$abundance <- x$abundance[on.index]
 		filteredData$offset <- x$offset[on.index,]
+		## Added August 8, 2013: thanks to Marie-Laure Endale for catching this one!
+		filteredData$AveLogCPM <- x$AveLogCPM[on.index]
 		
 		## Return various results
 		nf <- filter$norm.factor
@@ -305,6 +328,9 @@ setMethod(
 		plot=TRUE, plot.name=NA)
 	{
 
+		if(!require(edgeR)) {
+			stop("edgeR library must be installed.")
+		}
 		normalization <- match.arg(normalization)
 		data <- DGEGLM$counts
 		conds <- DGEGLM$samples$group
@@ -328,6 +354,8 @@ setMethod(
 		filteredData$deviance <- x$deviance[on.index]
 		filteredData$abundance <- x$abundance[on.index]
 		filteredData$offset <- x$offset[on.index,]
+		## Added August 8, 2013: thanks to Marie-Laure Endale for catching this one!
+		filteredData$AveLogCPM <- x$AveLogCPM[on.index]
 		
 		## Return various results
 		nf <- filter$norm.factor
@@ -340,6 +368,71 @@ setMethod(
 		return(filter.results)
 	}
 )
+
+
+
+
+## DESeqDataSet
+setMethod(
+	f= "HTSFilter",
+	signature = signature(x="DESeqDataSet"),
+	definition = function(x, s.min=1, s.max=200, s.len=100, 
+		loess.span=0.3, normalization=c("DESeq", "TMM", "none"), 
+		plot=TRUE, plot.name=NA) 
+
+	{
+		if(!require(DESeq2)) {
+			stop("DESeq2 library must be installed.")
+		}          
+		normalization <- match.arg(normalization)
+                data <- counts(x, normalized=FALSE)
+                if(ncol(colData(x)) > 2) {
+                  stop("HTSFilter currently only supports a single factor when working with DESeq2.")
+                }
+                conds <- colData(x)[,1]
+
+		## Run filter
+		filter <- .HTSFilterBackground(data=data, conds=conds, s.min=s.min,
+			s.max=s.max, s.len=s.len, loess.span=loess.span,
+			normalization=normalization, plot=plot, plot.name=plot.name)
+		on <- filter$on
+		on.index <- which(on == 1) 
+		filteredData <- x[on.index,]
+                
+                ## Re-adjust p-values
+                nm <- strsplit(colnames(mcols(filteredData)), split="_", fixed=TRUE)
+                Waldindex <- which(unlist(lapply(nm, function(yy) yy[1]))=="WaldPvalue")
+                LRTindex <- which(unlist(lapply(nm,  function(yy) yy[1]))=="LRTPvalue")
+                message("Note: BH correction of p-values used in HTSFilter.")
+                # Wald p-values
+                if(length(Waldindex) > 0 ) {
+                  for(j in Waldindex) {
+                    look <- substr(colnames(mcols(filteredData))[j], 12, 100)
+                    find <- which(substr(colnames(mcols(filteredData)), 12+3, 100) == look)
+                    find <- find[which(find > j)]
+                    mcols(filteredData)[,find] <- p.adjust(mcols(filteredData)[,j], method="BH")
+                  }
+                }
+                # LRT p-values
+                if(length(LRTindex) > 0 ) {
+                  for(j in LRTindex) {
+                    look <- substr(colnames(mcols(filteredData))[j], 11, 100)
+                    find <- which(substr(colnames(mcols(filteredData)), 11+3, 100) == look)
+                    find <- find[which(find > j)]
+                    mcols(filteredData)[,find] <- p.adjust(mcols(filteredData)[,j], method="BH")
+                  }
+                }
+                
+		## Return various results
+		filter.results <- list(filteredData = filteredData,
+			on = filter$on, s = filter$s.optimal,
+			indexValues = filter$index.values, normFactor = filter$norm.factor,
+			removedData = data[which(filter$on == 0),])
+
+		return(filter.results)
+	}
+)
+
 
 
 
