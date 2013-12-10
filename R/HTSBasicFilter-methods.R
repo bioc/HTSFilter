@@ -339,16 +339,13 @@ setMethod(
 	f= "HTSBasicFilter",
 	signature = signature(x="DESeqDataSet"),
 	definition = function(x, method, cutoff.type="value", cutoff=10,
-	length=NA, normalization=c("DESeq", "TMM", "none"))
+	length=NA, normalization=c("DESeq", "TMM", "none"), pAdjustMethod="BH")
 	{
 		if(!require(DESeq2)) {
 			stop("DESeq2 library must be installed.")
 		}          
 		normalization <- match.arg(normalization)
                 data <- counts(x, normalized=FALSE)
-                if(ncol(colData(x)) > 2) {
-                  stop("HTSFilter currently only supports a single factor when working with DESeq2.")
-                }
 
 		## Run filter
 		filter <- .HTSBasicFilterBackground(data=data, method=method,
@@ -358,18 +355,18 @@ setMethod(
 		on.index <- which(on == 1) 
 		filteredData <- x[on.index,]
                 
-                ## Re-adjust p-values
+		if(length(colnames(mcols(filteredData))) > 0) {
+                ## Re-adjust p-values, if they exist
                 nm <- strsplit(colnames(mcols(filteredData)), split="_", fixed=TRUE)
                 Waldindex <- which(unlist(lapply(nm, function(yy) yy[1]))=="WaldPvalue")
                 LRTindex <- which(unlist(lapply(nm,  function(yy) yy[1]))=="LRTPvalue")
-                message("Note: BH correction of p-values used in HTSFilter.")
                 # Wald p-values
                 if(length(Waldindex) > 0 ) {
                   for(j in Waldindex) {
                     look <- substr(colnames(mcols(filteredData))[j], 12, 100)
                     find <- which(substr(colnames(mcols(filteredData)), 12+3, 100) == look)
                     find <- find[which(find > j)]
-                    mcols(filteredData)[,find] <- p.adjust(mcols(filteredData)[,j], method="BH")
+                    mcols(filteredData)[,find] <- p.adjust(mcols(filteredData)[,j], method=pAdjustMethod)
                   }
                 }
                 # LRT p-values
@@ -378,9 +375,10 @@ setMethod(
                     look <- substr(colnames(mcols(filteredData))[j], 11, 100)
                     find <- which(substr(colnames(mcols(filteredData)), 11+3, 100) == look)
                     find <- find[which(find > j)]
-                    mcols(filteredData)[,find] <- p.adjust(mcols(filteredData)[,j], method="BH")
+                    mcols(filteredData)[,find] <- p.adjust(mcols(filteredData)[,j], method=pAdjustMethod)
                   }
                 }
+		}
                 
 		## Return various results
 		filter.results <- list(filteredData = filteredData,

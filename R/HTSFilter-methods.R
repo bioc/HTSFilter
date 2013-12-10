@@ -10,6 +10,9 @@ setMethod(
 		normalization <- match.arg(normalization)
 		data <- x
 
+		## Multiple factor designs
+		if(is.null(dim(conds)) == FALSE) conds <- do.call(paste, as.data.frame(conds))
+
 		## Run filter
 		filter <- .HTSFilterBackground(data=data, conds=conds, s.min=s.min,
 			s.max=s.max, s.len=s.len, loess.span=loess.span,
@@ -40,6 +43,9 @@ setMethod(
 			stop("Character values detected in data.frame x.\nPlease check that ID names are not included in one of the columns.")
 		}
 
+		## Multiple factor designs
+		if(is.null(dim(conds)) == FALSE) conds <- do.call(paste, as.data.frame(conds))
+
 		## Run filter
 		filter <- .HTSFilterBackground(data=data, conds=conds, s.min=s.min,
 			s.max=s.max, s.len=s.len, loess.span=loess.span,
@@ -69,9 +75,14 @@ setMethod(
 			stop("DESeq library must be installed.")
 		}
 
- 		## TO DO: WHAT TO DO IF MORE THAN ONE FACTOR?
  		if(is.na(conds)[1] == TRUE) {
 			conds <- pData(x)[,-which(colnames(pData(x)) == "sizeFactor")];
+			## Multiple factor designs
+			if(is.null(dim(conds)) == FALSE) conds <- do.call(paste, as.data.frame(conds))
+		}
+ 		if(is.na(conds)[1] == FALSE & is.null(dim(conds)) == FALSE) {
+			## Multiple factor designs
+		 	conds <- do.call(paste, as.data.frame(conds))
 		}
  
 		## What if alternative normalization is desired in filter?
@@ -282,7 +293,11 @@ setMethod(
 		}
 		normalization <- match.arg(normalization)
 		data <- x$counts
-		conds <- x$samples$group
+		conds <- x$design
+		## Remove intercept if present
+		if(colnames(conds)[1] == "(Intercept)") conds <- conds[,-1]
+		## Multiple factor designs
+		if(is.null(dim(conds)) == FALSE) conds <- do.call(paste, as.data.frame(conds))
 	
 		## Run filter
 		filter <- .HTSFilterBackground(data=data, conds=conds, s.min=s.min,
@@ -333,7 +348,11 @@ setMethod(
 		}
 		normalization <- match.arg(normalization)
 		data <- DGEGLM$counts
-		conds <- DGEGLM$samples$group
+		conds <- x$design
+		## Remove intercept if present
+		if(colnames(conds)[1] == "(Intercept)") conds <- conds[,-1]
+		## Multiple factor designs
+		if(is.null(dim(conds)) == FALSE) conds <- do.call(paste, as.data.frame(conds))
 	
 		## Run filter
 		filter <- .HTSFilterBackground(data=data, conds=conds, s.min=s.min,
@@ -378,7 +397,7 @@ setMethod(
 	signature = signature(x="DESeqDataSet"),
 	definition = function(x, s.min=1, s.max=200, s.len=100, 
 		loess.span=0.3, normalization=c("DESeq", "TMM", "none"), 
-		plot=TRUE, plot.name=NA) 
+		plot=TRUE, plot.name=NA, pAdjustMethod="BH") 
 
 	{
 		if(!require(DESeq2)) {
@@ -386,10 +405,13 @@ setMethod(
 		}          
 		normalization <- match.arg(normalization)
                 data <- counts(x, normalized=FALSE)
-                if(ncol(colData(x)) > 2) {
-                  stop("HTSFilter currently only supports a single factor when working with DESeq2.")
-                }
-                conds <- colData(x)[,1]
+
+		conds <- colData(x)
+		if("sizeFactor" %in% colnames(conds)) {
+			conds <- conds[,-which(colnames(conds) == "sizeFactor")]
+		}		
+		## Multiple factor designs
+		if(is.null(dim(conds)) == FALSE) conds <- do.call(paste, as.data.frame(conds))
 
 		## Run filter
 		filter <- .HTSFilterBackground(data=data, conds=conds, s.min=s.min,
@@ -399,29 +421,30 @@ setMethod(
 		on.index <- which(on == 1) 
 		filteredData <- x[on.index,]
                 
-                ## Re-adjust p-values
-                nm <- strsplit(colnames(mcols(filteredData)), split="_", fixed=TRUE)
-                Waldindex <- which(unlist(lapply(nm, function(yy) yy[1]))=="WaldPvalue")
-                LRTindex <- which(unlist(lapply(nm,  function(yy) yy[1]))=="LRTPvalue")
-                message("Note: BH correction of p-values used in HTSFilter.")
-                # Wald p-values
-                if(length(Waldindex) > 0 ) {
-                  for(j in Waldindex) {
-                    look <- substr(colnames(mcols(filteredData))[j], 12, 100)
-                    find <- which(substr(colnames(mcols(filteredData)), 12+3, 100) == look)
-                    find <- find[which(find > j)]
-                    mcols(filteredData)[,find] <- p.adjust(mcols(filteredData)[,j], method="BH")
-                  }
-                }
-                # LRT p-values
-                if(length(LRTindex) > 0 ) {
-                  for(j in LRTindex) {
-                    look <- substr(colnames(mcols(filteredData))[j], 11, 100)
-                    find <- which(substr(colnames(mcols(filteredData)), 11+3, 100) == look)
-                    find <- find[which(find > j)]
-                    mcols(filteredData)[,find] <- p.adjust(mcols(filteredData)[,j], method="BH")
-                  }
-                }
+		if(length(colnames(mcols(filteredData))) > 0) {
+                	## Re-adjust p-values, if they exist
+                	nm <- strsplit(colnames(mcols(filteredData)), split="_", fixed=TRUE)
+                	Waldindex <- which(unlist(lapply(nm, function(yy) yy[1]))=="WaldPvalue")
+                	LRTindex <- which(unlist(lapply(nm,  function(yy) yy[1]))=="LRTPvalue")
+                	# Wald p-values
+                	if(length(Waldindex) > 0 ) {
+                  	for(j in Waldindex) {
+                    		look <- substr(colnames(mcols(filteredData))[j], 12, 100)
+                    		find <- which(substr(colnames(mcols(filteredData)), 12+3, 100) == look)
+                    		find <- find[which(find > j)]
+                    		mcols(filteredData)[,find] <- p.adjust(mcols(filteredData)[,j], method=pAdjustMethod)
+                  	}
+                	}
+                	# LRT p-values
+                	if(length(LRTindex) > 0 ) {
+                  	for(j in LRTindex) {
+                    		look <- substr(colnames(mcols(filteredData))[j], 11, 100)
+                    		find <- which(substr(colnames(mcols(filteredData)), 11+3, 100) == look)
+                    		find <- find[which(find > j)]
+                    		mcols(filteredData)[,find] <- p.adjust(mcols(filteredData)[,j], method=pAdjustMethod)
+                  	}
+                	}
+		}
                 
 		## Return various results
 		filter.results <- list(filteredData = filteredData,
