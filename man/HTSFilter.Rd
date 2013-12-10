@@ -50,7 +50,7 @@ of replicates within each experimental condition.
 
 \S4method{HTSFilter}{DESeqDataSet}(x, s.min=1, s.max=200, s.len=100, 
      loess.span=0.3, normalization=c("DESeq", "TMM", "none"), 
-     plot=TRUE, plot.name=NA)
+     plot=TRUE, plot.name=NA, pAdjustMethod="BH")
 }
 
 \arguments{
@@ -96,6 +96,9 @@ Object of class DGEList, to be used when filtering objects of class DGEExact
 }
   \item{DGEGLM}{
 Object of class DGEGLM, to be used when filtering objects of class DGELRT
+}
+  \item{pAdjustMethod}{
+The method used to adjust p-values, see \code{?p.adjust}
 }
 }
 
@@ -206,7 +209,7 @@ dds <- DESeqDataSetFromMatrix(countData = exprs(sultan),
 dds <- DESeq(dds)
 filter <- HTSFilter(dds, s.len=25, plot=FALSE)$filteredData
 class(filter)
-## res <- results(filter)
+## res <- results(filter, independentFiltering=FALSE)
 
 
 }

@@ -14,8 +14,8 @@ more experimental conditions.
 \tabular{ll}{
 Package: \tab HTSFilter\cr
 Type: \tab Package\cr
-Version: \tab 1.1.1\cr
-Date: \tab 2013-08-08\cr
+Version: \tab 1.2.1\cr
+Date: \tab 2013-12-10\cr
 License: \tab Artistic-2.0\cr
 }
 }
@@ -88,7 +88,7 @@ dds <- DESeqDataSetFromMatrix(countData = exprs(sultan),
 dds <- DESeq(dds)
 filter <- HTSFilter(dds, s.len=25, plot=FALSE)$filteredData
 class(filter)
-## res <- results(filter)
+## res <- results(filter, independentFiltering=FALSE)
 
 
 }

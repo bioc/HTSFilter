@@ -40,7 +40,7 @@ This function implements a variety of basic filters for transcriptome sequencing
 	length=NA, normalization=c("TMM", "DESeq", "none"))
 
 \S4method{HTSBasicFilter}{DESeqDataSet}(x, method, cutoff.type="value", cutoff=10, 
-	length=NA, normalization=c("DESeq", "TMM", "none"))
+	length=NA, normalization=c("DESeq", "TMM", "none"), pAdjustMethod="BH")
 }
 
 \arguments{
@@ -72,6 +72,9 @@ DESeq package), \dQuote{pseudo.counts} (pseudo-counts obtained via quantile-quan
 edgeR package, only available for objects of class \code{DGEList} and \code{DGEExact}), and \dQuote{none} 
 (to be used only if user is certain no normalization is required, or if data have already been pre-normalized 
 by an alternative method)
+}
+  \item{pAdjustMethod}{
+The method used to adjust p-values, see \code{?p.adjust}
 }
 }
 
@@ -161,6 +164,7 @@ dds <- DESeq(dds)
 ## Filter genes with mean normalized gene counts less than the 40% quantile
 filter <- HTSBasicFilter(dds, method="mean", cutoff.type="quantile", 
 	cutoff = 0.4)
+## res <- results(filter, independentFiltering=FALSE)
 
 
 }
