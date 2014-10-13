@@ -1,7 +1,7 @@
 Package: HTSFilter
 Type: Package
 Title: Filter replicated high-throughput transcriptome sequencing data
-Version: 1.6.0
+Version: 1.7.0
 Date: 2013-12-10
 Author: Andrea Rau, Melina Gallopin, Gilles Celeux, and Florence
         Jaffrezic
