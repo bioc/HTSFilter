@@ -174,14 +174,19 @@ setMethod(
 		on <- filter$on
 		on.index <- which(on == 1)
 		filteredData <- x
-
-
+		
 		## Create a new DGEList
 		filteredData <- x
 		filteredData$counts <- x$counts[on.index,]
 		filteredData$pseudo.counts <- x$pseudo.counts[on.index,]
-		filteredData$logCPM <- x$logCPM[on.index]
+		## logCPM removed April 3, 2015 because no longer included in DGEList
+		## filteredData$logCPM <- x$logCPM[on.index]
 		filteredData$tagwise.dispersion <- x$tagwise.dispersion[on.index]
+		## Added August 8, 2013: thanks to Marie-Laure Endale for catching this one!
+		filteredData$genes <- x$genes[on.index]
+		filteredData$AveLogCPM <- x$AveLogCPM[on.index]
+		filteredData$trended.dispersion <- x$trended.dispersion[on.index]
+		filteredData$offset <- x$offset[on.index,]
 
 		## Reset library sizes if filtering before estimating dispersion parameters 
 		if(is.null(x$common.dispersion) == TRUE) {
@@ -278,6 +283,10 @@ setMethod(
 		filteredData$fitted.values <- x$fitted.values[on.index,]
 		filteredData$abundance <- x$abundance[on.index]
 		filteredData$offset <- x$offset[on.index,]
+		## Added August 8, 2013: thanks to Marie-Laure Endale for catching this one!
+		filteredData$AveLogCPM <- x$AveLogCPM[on.index]
+		## Added April 3, 2015
+		filteredData$unshrunk.coefficients <- x$unshrunk.coefficients[on.index,]
 		
 		## Return various results
 		nf <- filter$norm.factor
@@ -314,14 +323,20 @@ setMethod(
 		filteredData <- x
 		filteredData$table <- x$table[on.index,]
 		filteredData$coefficients <- x$coefficients[on.index,]
-		filteredData$genes <- x$genes[on.index]
-		filteredData$weights <- x$weights[on.index,]
+		## Added April 3, 2015:
+		filteredData$unshrunk.coefficients <- x$unshrunk.coefficients[on.index,]
+		filteredData$df.test <- x$df.test[on.index]
+		## Removed April 3, 2015:
+		## filteredData$genes <- x$genes[on.index]
+		## filteredData$weights <- x$weights[on.index,]
+		## filteredData$abundance <- x$abundance[on.index]
 		filteredData$df.residual <- x$df.residual[on.index]
 		filteredData$dispersion <- x$dispersion[on.index]
 		filteredData$fitted.values <- x$fitted.values[on.index,]
 		filteredData$deviance <- x$deviance[on.index]
-		filteredData$abundance <- x$abundance[on.index]
 		filteredData$offset <- x$offset[on.index,]
+		## Added August 8, 2013: thanks to Marie-Laure Endale for catching this one!
+		filteredData$AveLogCPM <- x$AveLogCPM[on.index]
 		
 		## Return various results
 		nf <- filter$norm.factor
@@ -354,31 +369,32 @@ setMethod(
 		on <- filter$on
 		on.index <- which(on == 1) 
 		filteredData <- x[on.index,]
-                
-		if(length(colnames(mcols(filteredData))) > 0) {
-                ## Re-adjust p-values, if they exist
-                nm <- strsplit(colnames(mcols(filteredData)), split="_", fixed=TRUE)
-                Waldindex <- which(unlist(lapply(nm, function(yy) yy[1]))=="WaldPvalue")
-                LRTindex <- which(unlist(lapply(nm,  function(yy) yy[1]))=="LRTPvalue")
-                # Wald p-values
-                if(length(Waldindex) > 0 ) {
-                  for(j in Waldindex) {
-                    look <- substr(colnames(mcols(filteredData))[j], 12, 100)
-                    find <- which(substr(colnames(mcols(filteredData)), 12+3, 100) == look)
-                    find <- find[which(find > j)]
-                    mcols(filteredData)[,find] <- p.adjust(mcols(filteredData)[,j], method=pAdjustMethod)
-                  }
-                }
-                # LRT p-values
-                if(length(LRTindex) > 0 ) {
-                  for(j in LRTindex) {
-                    look <- substr(colnames(mcols(filteredData))[j], 11, 100)
-                    find <- which(substr(colnames(mcols(filteredData)), 11+3, 100) == look)
-                    find <- find[which(find > j)]
-                    mcols(filteredData)[,find] <- p.adjust(mcols(filteredData)[,j], method=pAdjustMethod)
-                  }
-                }
-		}
+            
+## April 3, 2015: remove this as p-values are not adjusted in DESeqDataSet			
+#		if(length(colnames(mcols(filteredData))) > 0) {
+#                ## Re-adjust p-values, if they exist
+#                nm <- strsplit(colnames(mcols(filteredData)), split="_", fixed=TRUE)
+#                Waldindex <- which(unlist(lapply(nm, function(yy) yy[1]))=="WaldPvalue")
+#                LRTindex <- which(unlist(lapply(nm,  function(yy) yy[1]))=="LRTPvalue")
+#                # Wald p-values
+#                if(length(Waldindex) > 0 ) {
+#                  for(j in Waldindex) {
+#                    look <- substr(colnames(mcols(filteredData))[j], 12, 100)
+#                    find <- which(substr(colnames(mcols(filteredData)), 12+3, 100) == look)
+#                    find <- find[which(find > j)]
+#                    mcols(filteredData)[,find] <- p.adjust(mcols(filteredData)[,j], method=pAdjustMethod)
+#                  }
+#                }
+#                # LRT p-values
+#                if(length(LRTindex) > 0 ) {
+#                  for(j in LRTindex) {
+#                    look <- substr(colnames(mcols(filteredData))[j], 11, 100)
+#                    find <- which(substr(colnames(mcols(filteredData)), 11+3, 100) == look)
+#                    find <- find[which(find > j)]
+#                    mcols(filteredData)[,find] <- p.adjust(mcols(filteredData)[,j], method=pAdjustMethod)
+#                  }
+#                }
+#		}
                 
 		## Return various results
 		filter.results <- list(filteredData = filteredData,

@@ -152,18 +152,28 @@ dge <- calcNormFactors(dge)
 filter <- HTSBasicFilter(dge, method="cpm", cutoff.type=2, cutoff=100)
 
 
-########################################################################
-## DESeq2
+
+
 ########################################################################
 
+## DESeq2
+
+########################################################################
+
+
 library(DESeq2)
+
 dds <- DESeqDataSetFromMatrix(countData = exprs(sultan),
+                              
                               colData = data.frame(cell.line = conds),
+
                               design = ~ cell.line)
-dds <- DESeq(dds)
-## Filter genes with mean normalized gene counts less than the 40% quantile
-filter <- HTSBasicFilter(dds, method="mean", cutoff.type="quantile", 
-	cutoff = 0.4)
+
+## Not run: Filter genes with mean normalized gene counts < 40% quantile
+##
+## dds <- DESeq(dds)
+## filter <- HTSBasicFilter(dds, method="mean", cutoff.type="quantile", 
+##	cutoff = 0.4)
 ## res <- results(filter, independentFiltering=FALSE)
 
 

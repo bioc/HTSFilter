@@ -37,7 +37,7 @@ S. Anders and W. Huber (2010). Differential expression analysis for sequence cou
 \emph{Genome Biology}, 11(R106):1-28.
 
 A. Rau, M. Gallopin, G. Celeux, F. Jaffrezic (2013). Data-based filtering 
-for replicated high-throughput transcriptome sequencing experiments. \emph{Bioinformatics},
+for replicated high-throughput transcriptome sequencing experiments. \emph{Bioinformatics}, 
 doi: 10.1093/bioinformatics/btt350.
 
 M. D. Robinson and A. Oshlack (2010). A scaling normalization method for differential expression

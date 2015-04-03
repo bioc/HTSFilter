@@ -1,6 +1,14 @@
-            
+﻿            
                 RELEASE HISTORY OF HTSFilter PACKAGE
              ========================================
+
+	CHANGES in HTSFilter VERSION 1.7.1
+	
+-- Minor bug fix for integration in edgeR pipeline
+-- Minor updates in vignette and documentation
+-- Removed IRanges and GenomicRanges from imports (hard-coded
+the mcols and colData functions for use in DESeq2 pipeline instead)
+-- Add BiocStyle to Suggests for vignette style
 
 	CHANGES in HTSFilter VERSION 1.2.1
 
@@ -8,9 +16,8 @@
 filtering available)
 -- HTSFilter now accepts data with multi-factor designs for all input types
 
-
 	CHANGES in HTSFilter VERSION 1.0.1
-
+	
 -- Updated citation information, minor updates to vignette
 -- DESeq2, IRanges, and GenomicRanges added to Imports field, and HTSFilter and HTSFilterBasic 
 methods written for objects of with DESeqDataSet signature (from DESeq2 pipeline). 
@@ -19,14 +26,13 @@ Examples illustrating the use of HTSFilter have also been added in the documenta
 -- Warning message added when gene ID's are included as a column in the data frame
 (thanks to Luc Jouneau for the suggestion)
 
-
 	CHANGES in HTSFilter VERSION 0.99.3-0.99.8
 
 -- Fixed minor bugs in HTSBasicFilter function for rpkm calculation
 -- Minor changes to vignette
 
 	CHANGES in HTSFilter VERSION 0.99.2
-
+	
 -- Small updates to vignette, fixed small bug in HTSBasicFilter function and doc
 
 		CHANGES in HTSFilter VERSION 0.99.1

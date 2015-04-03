@@ -14,8 +14,8 @@ more experimental conditions.
 \tabular{ll}{
 Package: \tab HTSFilter\cr
 Type: \tab Package\cr
-Version: \tab 1.3.1\cr
-Date: \tab 2013-12-10\cr
+Version: \tab 1.7.1\cr
+Date: \tab 2015-03-04\cr
 License: \tab Artistic-2.0\cr
 }
 }
@@ -33,7 +33,7 @@ P. Jaccard (1901). Etude comparative de la distribution orale dans une portion 
 \emph{Bulletin de la Societe Vaudoise des Sciences Naturelles}, \bold{37}:547-549.
 
 A. Rau, M. Gallopin, G. Celeux, F. Jaffrezic (2013). Data-based filtering 
-for replicated high-throughput transcriptome sequencing experiments. \emph{Bioinformatics},
+for replicated high-throughput transcriptome sequencing experiments. \emph{Bioinformatics}, 
 doi: 10.1093/bioinformatics/btt350.
 
 }
@@ -77,18 +77,33 @@ et <- HTSFilter(et, DGEList=dge, s.len=25, plot=FALSE)$filteredData
 ## topTags(et)
 
 
-########################################################################
-## DESeq2
+
+
+
 ########################################################################
 
+## DESeq2
+
+########################################################################
+
+
 library(DESeq2)
+
 dds <- DESeqDataSetFromMatrix(countData = exprs(sultan),
+
                               colData = data.frame(cell.line = conds),
+
                               design = ~ cell.line)
-dds <- DESeq(dds)
-filter <- HTSFilter(dds, s.len=25, plot=FALSE)$filteredData
-class(filter)
+## Not run:
+##
+## dds <- DESeq(dds)
+
+## filter <- HTSFilter(dds, s.len=25, plot=FALSE)$filteredData
+
+## class(filter)
+
 ## res <- results(filter, independentFiltering=FALSE)
+
 
 
 }

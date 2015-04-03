@@ -5,38 +5,22 @@
 %\VignettePackage{HTSFilter}
 \documentclass[12pt,utf8x]{article}
 
-\SweaveOpts{eps=FALSE,echo=TRUE,png=TRUE,pdf=FALSE,figs.only=TRUE}
-\usepackage{times}
-\usepackage[numbers,sort&compress]{natbib}
-\usepackage[colorlinks=TRUE,urlcolor=blue,citecolor=blue,linkcolor=blue]{hyperref}
 \usepackage{subfigure}
 \usepackage{amsmath}
-
-\newcommand{\Rfunction}[1]{{\texttt{#1}}}
-\newcommand{\Robject}[1]{{\texttt{#1}}}
-\newcommand{\Rpackage}[1]{{\textit{#1}}}
-\newcommand{\Rmethod}[1]{{\texttt{#1}}}
-\newcommand{\Rfunarg}[1]{{\texttt{#1}}}
-\newcommand{\Rclass}[1]{{\textit{#1}}}
-\newcommand{\Rcode}[1]{{\texttt{#1}}}
-\newcommand{\software}[1]{\textsf{#1}}
-\newcommand{\R}{\software{R}}
-\newcommand{\HTSFilter}{\Rpackage{HTSFilter}}
+\usepackage{Sweave}
+\newcommand{\HTSFilter}{\Biocpkg{HTSFilter}}
 
 
-\textwidth=6.2in
-\textheight=8.5in
-\oddsidemargin=0.2in
-\evensidemargin=0.2in
-\headheight=0in
-\headsep=0in
+<<style-Sweave, eval=TRUE, echo=FALSE, results=tex>>=
+BiocStyle::latex()
+@
 
 \begin{document}
 
-\title{HTSFilter: Data-based filtering for replicated transcriptome sequencing experiments
+\title{\HTSFilter: Data-based filtering for replicated transcriptome sequencing experiments
 }
 \author{Andrea Rau, M{\'e}lina Gallopin, Gilles Celeux, Florence Jaffr{\'e}zic}
-\date{Modified: December 10, 2013.   Compiled: \today}
+\date{Modified: April 3, 2015.   Compiled: \today}
 \maketitle
 
 <<echo=FALSE>>=
@@ -44,7 +28,7 @@ options(width=60)
 @ 
 
 \begin{abstract}
-This vignette illustrates the use of the \Rpackage{HTSFilter} package to filter replicated data from transcriptome sequencing experiments (e.g., RNA sequencing data) for a variety of different data classes: \Rclass{matrix}, \Rclass{data.frame}, \Rclass{CountDataSet} (the S4 class associated with the \Rpackage{DESeq} package), the S3 classes associated with the \Rpackage{edgeR} package (\Rclass{DGEList}, \Rclass{DGEExact}, \Rclass{DGEGLM}, and \Rclass{DGELRT}), and the S4 class associated with the \Rpackage{DESeq2} package (\Rclass{DESeqDataSet}). 
+This vignette illustrates the use of the \Biocpkg{HTSFilter} package to filter replicated data from transcriptome sequencing experiments (e.g., RNA sequencing data) for a variety of different data classes: \Rclass{matrix}, \Rclass{data.frame}, \Rclass{CountDataSet} (the S4 class associated with the \Biocpkg{DESeq} package), the S3 classes associated with the \Biocpkg{edgeR} package (\Rclass{DGEList}, \Rclass{DGEExact}, \Rclass{DGEGLM}, and \Rclass{DGELRT}), and the S4 class associated with the \Biocpkg{DESeq2} package (\Rclass{DESeqDataSet}). 
 \end{abstract}
 
 \tableofcontents
@@ -55,34 +39,34 @@ This vignette illustrates the use of the \Rpackage{HTSFilter} package to filter 
  
 High-throughput sequencing (HTS) data, such as RNA-sequencing (RNA-seq) data, are increasingly used to conduct differential analyses, in which statistical tests are performed for each biological feature (e.g., a gene, transcript, exon) in order to identify those whose expression levels show systematic covariation with a particular condition, such as a treatment or phenotype of interest. For the remainder of this vignette, we will focus on gene-level differential analyses, although these methods may also be applied to differential analyses of (count-based measures of) transcript- or exon-level expression.
 
-Because hypothesis tests are performed for gene-by-gene differential analyses, the obtained $p$-values must be adjusted to correct for multiple testing. However, procedures to adjust $p$-values to control the number of detected false positives often lead to a loss of power to detect truly differentially expressed (DE) genes due to the large number of hypothesis tests performed. To reduce the impact of such procedures, independent data filters are often used to identify and remove genes that appear to generate an uninformative signal \cite{Bourgon2010}; this in turn moderates the correction needed to adjust for multiple testing. For independent filtering methods for microarray data, see for example the \Rpackage{genefilter} Bioconductor package \cite{Gentleman}.
+Because hypothesis tests are performed for gene-by-gene differential analyses, the obtained $p$-values must be adjusted to correct for multiple testing. However, procedures to adjust $p$-values to control the number of detected false positives often lead to a loss of power to detect truly differentially expressed (DE) genes due to the large number of hypothesis tests performed. To reduce the impact of such procedures, independent data filters are often used to identify and remove genes that appear to generate an uninformative signal \cite{Bourgon2010}; this in turn moderates the correction needed to adjust for multiple testing. For independent filtering methods for microarray data, see for example the \Biocpkg{genefilter} Bioconductor package \cite{Gentleman}.
 
-The \Rpackage{HTSFilter} package implements a novel data-based filtering procedure based on the calculation of a similarity index among biological replicates for read counts arising from replicated transcriptome sequencing (RNA-seq) data. This technique provides an intuitive data-driven way to filter high-throughput transcriptome sequencing data and to effectively remove genes with low, constant expression levels without incorrectly removing those that would otherwise have been identified as DE. The two fundamental assumptions of the filter implemented in the \Rpackage{HTSFilter} package are as follows: 
+The \Biocpkg{HTSFilter} package implements a novel data-based filtering procedure based on the calculation of a similarity index among biological replicates for read counts arising from replicated transcriptome sequencing (RNA-seq) data. This technique provides an intuitive data-driven way to filter high-throughput transcriptome sequencing data and to effectively remove genes with low, constant expression levels without incorrectly removing those that would otherwise have been identified as DE. The two fundamental assumptions of the filter implemented in the \Biocpkg{HTSFilter} package are as follows: 
 \begin{enumerate}
 \item Biological replicates are present for each experimental condition, and
 \item Data can be appropriately normalized (scaled) to correct for systematic inter-sample biases.
 \end{enumerate}
-Assuming these conditions hold, \Rpackage{HTSFilter} implements a method to identify a filtering threshold that maximizes the {\it filtering similarity} among replicates, that is, one where most genes tend to either have normalized counts less than or equal to the cutoff in all samples (i.e., filtered genes) or greater than the cutoff in all samples (i.e., non-filtered genes). This filtering similarity is defined using the global Jaccard index, that is, the average Jaccard index calculated between pairs of replicates within each experimental condition; see \citet{Rau2012a} for more details.
+Assuming these conditions hold, \Biocpkg{HTSFilter} implements a method to identify a filtering threshold that maximizes the {\it filtering similarity} among replicates, that is, one where most genes tend to either have normalized counts less than or equal to the cutoff in all samples (i.e., filtered genes) or greater than the cutoff in all samples (i.e., non-filtered genes). This filtering similarity is defined using the global Jaccard index, that is, the average Jaccard index calculated between pairs of replicates within each experimental condition; see Rau {\it et al.} (2013) \cite{Rau2012a} for more details.
 
-For more information about between-sample normalization strategies, see \cite{Dillies2012}; in particular, strategies for normalizing data with differences in library size and composition may be found in \cite{Anders2010} and \cite{Robinson2010}, and strategies for normalizing data exhibiting sample-specific biases due to GC content may be found in \cite{Risso2011} and \cite{Hansen2012}. Within the \Rpackage{HTSFilter} package, the Trimmed Means of M-values (TMM) \cite{Robinson2010} and DESeq \cite{Anders2010} normalization strategies may be used prior to calculating an appropriate data-based filter. If an alternative normalization strategy is needed or desired, the normalization may be applied prior to filtering the data with \texttt{normalization="none"} in the \Rfunction{HTSFilter} function; see Section~\ref{sec:EDAseqnorm} for an example.
+For more information about between-sample normalization strategies, see \cite{Dillies2012}; in particular, strategies for normalizing data with differences in library size and composition may be found in \cite{Anders2010} and \cite{Robinson2010}, and strategies for normalizing data exhibiting sample-specific biases due to GC content may be found in \cite{Risso2011} and \cite{Hansen2012}. Within the \Biocpkg{HTSFilter} package, the Trimmed Means of M-values (TMM) \cite{Robinson2010} and DESeq \cite{Anders2010} normalization strategies may be used prior to calculating an appropriate data-based filter. If an alternative normalization strategy is needed or desired, the normalization may be applied prior to filtering the data with \texttt{normalization="none"} in the \Rfunction{HTSFilter} function; see Section~\ref{sec:EDAseqnorm} for an example.
 
-The \Rpackage{HTSFilter} package is able to accommodate unnormalized or normalized replicated count data in the form of a \Rclass{matrix} or \Rclass{data.frame} (in which each row corresponds to a biological feature and each column to a biological sample), a \Rclass{CountDataSet} (the S4 class associated with the \Rpackage{DESeq} package), one of the S3 classes associated with the \Rpackage{edgeR} package (\Rclass{DGEList}, \Rclass{DGEExact}, \Rclass{DGEGLM}, and \Rclass{DGELRT}), or \Rclass{DESeqDataSet} (the S4 class associated with the \Rpackage{DESeq2} package), as illustrated in the following sections.
+The \Biocpkg{HTSFilter} package is able to accommodate unnormalized or normalized replicated count data in the form of a \Rclass{matrix} or \Rclass{data.frame} (in which each row corresponds to a biological feature and each column to a biological sample), a \Rclass{CountDataSet} (the S4 class associated with the \Biocpkg{DESeq} package), one of the S3 classes associated with the \Biocpkg{edgeR} package (\Rclass{DGEList}, \Rclass{DGEExact}, \Rclass{DGEGLM}, and \Rclass{DGELRT}), or \Rclass{DESeqDataSet} (the S4 class associated with the \Biocpkg{DESeq2} package), as illustrated in the following sections.
 
 \begin{figure}[t!]
 \centering
-\includegraphics[width = .65\textwidth]{HTSFilter-loadingPackages.png}
-\caption{Histogram of log transformed counts from the Sultan et al. data \cite{Sultan2008}, illustrating the large number of genes with very small counts as well as the large heterogeneity in counts observed. \label{fig0}}
+\includegraphics[width = .65\textwidth]{HTSFilter-loadingPackages}
+\caption{Histogram of log transformed counts from the Sultan {\it et al.} data \cite{Sultan2008}, illustrating the large number of genes with very small counts as well as the large heterogeneity in counts observed. \label{fig0}}
 \end{figure}
 
-Finally, we note that the filtering method implemented in the \Rpackage{HTSFilter} package is designed to filter transcriptome sequencing, and not microarray, data; in particular, the proposed filter is effective for data with features that take on values over a large order of magnitude and with a subset of features exhibiting small levels of expression across samples (see, for example, Figure~\ref{fig0}). In this vignette, we illustrate its use on count-based measures of gene expression, although its use is not strictly limited to discrete data.
+Finally, we note that the filtering method implemented in the \Biocpkg{HTSFilter} package is designed to filter transcriptome sequencing, and not microarray, data; in particular, the proposed filter is effective for data with features that take on values over a large order of magnitude and with a subset of features exhibiting small levels of expression across samples (see, for example, Figure~\ref{fig0}). In this vignette, we illustrate its use on count-based measures of gene expression, although its use is not strictly limited to discrete data.
 
 %--------------------------------------------------
 \section{Input data} \label{sec:prep}
 %--------------------------------------------------
 
-For the purposes of this vignette, we make use of data from a study of sex-specific expression of liver cells in human and the \Rpackage{DESeq} and \Rpackage{edgeR} packages for differential analysis. Sultan et al. \cite{Sultan2008} obtained a high-throughput sequencing data (using a 1G Illumina Genome Analyzer sequencing machine) from a human embryonic kidney and a B cell line, with two biological replicates each. The raw read counts and phenotype tables were obtained from the ReCount online resource \cite{Frazee2011}.
+For the purposes of this vignette, we make use of data from a study of sex-specific expression of liver cells in human and the \Biocpkg{DESeq} and \Biocpkg{edgeR} packages for differential analysis. Sultan {\it et al.} \cite{Sultan2008} obtained a high-throughput sequencing data (using a 1G Illumina Genome Analyzer sequencing machine) from a human embryonic kidney and a B cell line, with two biological replicates each. The raw read counts and phenotype tables were obtained from the ReCount online resource \cite{Frazee2011}.
 
-To begin, we load the \Rpackage{HTSFilter} package, and attach the gene-level count data contained in \Robject{sultan}:
+To begin, we load the \Biocpkg{HTSFilter} package, and attach the gene-level count data contained in \Robject{sultan}:
 
 <<loadingPackages, fig=TRUE, include=FALSE>>=
 library(HTSFilter)
@@ -118,13 +102,13 @@ dim(filter$removedData)
 
 \begin{figure}[t!]
 \centering
-\includegraphics[width = .65\textwidth]{HTSFilter-matrix.png}
+\includegraphics[width = .65\textwidth]{HTSFilter-matrix}
 \caption{Global Jaccard index for the \Robject{sultan} data calculated for a variety of threshold values after TMM normalization \cite{Robinson2010}, with a loess curve (blue line) superposed and data-based threshold values (red cross and red dotted line) equal to 11.764. \label{fig1}}
 \end{figure}
 
 For this example, we find a data-based threshold equal to 11.764; genes with normalized values less than this threshold in all samples are filtered from subsequent analyses. The proposed filter thus removes 4015 genes from further analyses, leaving 4995 genes. 
 
-We note that an important part of the filter proposed in the \Rpackage{HTSFilter} package is a check of the behavior of the global similarity index calculated over a range of threshold values, and in particular, to verify that a reasonable maximum value is reached for the global similarity index over the range of tested threshold values (see Figure~\ref{fig1}); the maximum possible value for the global Jaccard index is 1. To illustrate the importance of this check, we attempt to re-apply the proposed filter to the previously filtered data (in practice, of course, this would be nonsensical):
+We note that an important part of the filter proposed in the \Biocpkg{HTSFilter} package is a check of the behavior of the global similarity index calculated over a range of threshold values, and in particular, to verify that a reasonable maximum value is reached for the global similarity index over the range of tested threshold values (see Figure~\ref{fig1}); the maximum possible value for the global Jaccard index is nearly 1. To illustrate the importance of this check, we attempt to re-apply the proposed filter to the previously filtered data (in practice, of course, this would be nonsensical):
 
 <<refilter, fig=TRUE, include=FALSE, width=8, height=4>>=
 par(mfrow = c(1,2), mar = c(4,4,2,2))
@@ -136,25 +120,25 @@ hist(log(filter.2$filteredData+1), col="grey", breaks=25, main="",
 
 \begin{figure}[t!]
 \centering
-\includegraphics[width = .95\textwidth]{HTSFilter-refilter.png}
+\includegraphics[width = .95\textwidth]{HTSFilter-refilter}
 \caption{(left) Global Jaccard index for the \Robject{sultan} data calculated for a variety of threshold values after TMM normalization \cite{Robinson2010}, with a loess curve (blue line) superposed and data-based threshold values (red cross and red dotted line) equal to 11.764. (right) Global Jaccard index for the previously filtered \Robject{sultan} data, with loess curve (blue line) superposed as before. \label{fig1b}}
 \end{figure}
 
 In the lefthand panel of Figure~\ref{fig1b}, we note a plateau of large global Jaccard index values for thresholds less than 2, with a decrease thereafter; this corresponds to filtering no genes, unsurprising given that genes with low, constant levels of expression have already been filtered from the analysis (see the righthand panel of Figure~\ref{fig1b}).
 
 %--------------------------------------------------
-\section{\Rpackage{DESeq} package pipeline: S4 class \Rclass{CountDataSet}} \label{sec:cds}
+\section{\Biocpkg{DESeq} package pipeline: S4 class \Rclass{CountDataSet}} \label{sec:cds}
 %--------------------------------------------------
 
-The \Rpackage{HTSFilter} package allows for three potential applications of the proposed filter within the \Rpackage{DESeq} analysis pipeline:
+The \Biocpkg{HTSFilter} package allows for three potential applications of the proposed filter within the \Biocpkg{DESeq} analysis pipeline:
 \begin{enumerate}
-\item Estimation of library sizes and dispersion parameters (the \Rfunction{estimateSizeEffects} and \Rfunction{estimateDispersions} functions in \Rpackage{DESeq}), followed by data filtering on normalized data (recommended);
+\item Estimation of library sizes and dispersion parameters (the \Rfunction{estimateSizeEffects} and \Rfunction{estimateDispersions} functions in \Biocpkg{DESeq}), followed by data filtering on normalized data (recommended);
 \item Estimation of library sizes (\Rfunction{estimateSizeEffects}), data filtering on normalized data, and estimation of dispersion parameters (\Rfunction{estimateDispersions});
 \item Data filtering on normalized data, followed by re-estimation of library sizes and estimation of dispersion parameters (\Rfunction{estimateSizeEffects} and \Rfunction{estimateDispersions}).
 \end{enumerate}  
-We note that the primary difference among the three strategies would be seen in the dispersion parameters estimates for genes with low levels of expression; because fitted dispersion values are estimated based on the mean-dispersion relationship observed across the full data in the \Rpackage{DESeq} package, estimates obtained on filtered data will necessarily be slightly different from those obtained on unfiltered data, as genes with low levels of expression would have been removed from the former. On the other hand, we note that the filtering thresholds (and as such, the genes filtered from the analysis) are identical for the three strategies listed above. The estimated library sizes may differ slightly in the third strategy as compared to the first and second strategies; however, this difference will be minimal as only genes with weak, constant levels of expression are filtered from the analysis. A full discussion of these three strategies is beyond the scope of this vignette; however, in practice we recommend the use of the first strategy: estimation of library sizes and dispersion parameters prior to data filtering.
+We note that the primary difference among the three strategies would be seen in the dispersion parameters estimates for genes with low levels of expression; because fitted dispersion values are estimated based on the mean-dispersion relationship observed across the full data in the \Biocpkg{DESeq} package, estimates obtained on filtered data will necessarily be slightly different from those obtained on unfiltered data, as genes with low levels of expression would have been removed from the former. On the other hand, we note that the filtering thresholds (and as such, the genes filtered from the analysis) are identical for the three strategies listed above. The estimated library sizes may differ slightly in the third strategy as compared to the first and second strategies; however, this difference will be minimal as only genes with weak, constant levels of expression are filtered from the analysis. A full discussion of these three strategies is beyond the scope of this vignette; however, in practice we recommend the use of the first strategy: estimation of library sizes and dispersion parameters prior to data filtering.
 
-To filter high-throughput sequencing data in the form of a \Rclass{CountDataSet} (the class used within the \Rpackage{DESeq} pipeline for differential analysis), we coerce \Robject{sultan} into an object of the class \Rclass{CountDataSet}. Once again, we specify that the number of tested thresholds be only 25 (\Rcode{s.len=25}) rather than the default value of 100 to reduce computation time. For objects in the form of a \Rclass{CountDataSet}, the default normalization strategy is \Rcode{"DESeq"}, although alternative normalization strategies may also be used.
+To filter high-throughput sequencing data in the form of a \Rclass{CountDataSet} (the class used within the \Biocpkg{DESeq} pipeline for differential analysis), we coerce \Robject{sultan} into an object of the class \Rclass{CountDataSet}. Once again, we specify that the number of tested thresholds be only 25 (\Rcode{s.len=25}) rather than the default value of 100 to reduce computation time. For objects in the form of a \Rclass{CountDataSet}, the default normalization strategy is \Rcode{"DESeq"}, although alternative normalization strategies may also be used.
 
 <<cds, fig=TRUE, include=FALSE>>=
 cds <- newCountDataSet(exprs(sultan), conds)
@@ -170,17 +154,17 @@ dim(cds)
 
 \begin{figure}[t!]
 \centering
-\includegraphics[width = .65\textwidth]{HTSFilter-cds.png}
+\includegraphics[width = .65\textwidth]{HTSFilter-cds}
 \caption{Global Jaccard index for the \Robject{sultan} data calculated for a variety of threshold values after DESeq normalization \cite{Anders2010}, with a loess curve (blue line) superposed and data-based threshold values (red cross and red dotted line) equal to 10.429.\label{fig2}}
 \end{figure}
 
 As the normalization strategy used here was slightly different, the proposed filter now removes 3867 genes from further analyses, leaving 5143 genes. Again we verify the behavior of the global similarity index calculated over a range of threshold values (see Figure~\ref{fig2}). For this example, we find a data-based threshold equal to 10.429; genes with normalized values less than this threshold in all samples are filtered from subsequent analyses.
 
 %--------------------------------------------------
-\section{\Rpackage{edgeR} package pipeline} \label{sec:dge}
+\section{\Biocpkg{edgeR} package pipeline} \label{sec:dge}
 %--------------------------------------------------
 
-We next illustrate the use of \Rpackage{HTSFilter} within the \Rpackage{edgeR} pipeline for differential analysis (S3 classes \Rclass{DGEList}, \Rclass{DGEExact}, \Rclass{DGEGLM}, or \Rclass{DGELRT}). For the purposes of this vignette, we will consider the S3 classes \Rclass{DGEExact} and \Rclass{DGELRT}. The former is the class containing the results of the differential expression analysis between two groups of count libraries (resulting from a call to the function \Rfunction{exactTest} in \Rpackage{edgeR}); the latter is the class containing the results of a generalized linear model (GLM)-based differential analysis (resulting from a call to the function \Rfunction{glmLRT} in \Rpackage{edgeR}). Although the filter may be applied earlier in the \Rpackage{edgeR} pipeline (i.e., to objects of class \Rclass{DGEList} or \Rclass{DGEGLM}), we do not recommend doing so, as parameter estimation makes use of counts adjusted using a a quantile-to-quantile method (pseudo-counts).
+We next illustrate the use of \Biocpkg{HTSFilter} within the \Biocpkg{edgeR} pipeline for differential analysis (S3 classes \Rclass{DGEList}, \Rclass{DGEExact}, \Rclass{DGEGLM}, or \Rclass{DGELRT}). For the purposes of this vignette, we will consider the S3 classes \Rclass{DGEExact} and \Rclass{DGELRT}. The former is the class containing the results of the differential expression analysis between two groups of count libraries (resulting from a call to the function \Rfunction{exactTest} in \Biocpkg{edgeR}); the latter is the class containing the results of a generalized linear model (GLM)-based differential analysis (resulting from a call to the function \Rfunction{glmLRT} in \Biocpkg{edgeR}). Although the filter may be applied earlier in the \Biocpkg{edgeR} pipeline (i.e., to objects of class \Rclass{DGEList} or \Rclass{DGEGLM}), we do not recommend doing so, as parameter estimation makes use of counts adjusted using a a quantile-to-quantile method (pseudo-counts).
 
 \subsection{S3 class \Rclass{DGEExact}}
 
@@ -228,14 +212,14 @@ topTags(lrt)
 
 
 %--------------------------------------------------
-\section{\Rpackage{DESeq2} package pipeline: S4 class \Rclass{DESeqDataSet}} \label{sec:deseq2}
+\section{\Biocpkg{DESeq2} package pipeline: S4 class \Rclass{DESeqDataSet}} \label{sec:deseq2}
 %--------------------------------------------------
 
-The \Rpackage{HTSFilter} package allows for a straightforward integration within the \Rpackage{DESeq2} analysis pipeline, most notably allowing for $p$-values to be adjusted only for those genes passing the filter. Note that \Rpackage{DESeq2} now impelements an independent filtering procedure by default in the \Rfunction{results} function; this filter is a potential alternative filtering technique and does not need to be used in addition to the one included in \Rpackage{HTSFilter}. In fact, each filter is targeting the same weakly expressed genes to be filtered from the analysis. As such, if the user wishes to make use of \Rpackage{HTSFilter} within the \Rpackage{DESeq2} pipeline, the argument \texttt{independentFiltering=FALSE} should be used when calling the \Rfunction{results} function in \Rpackage{DESeq2}.
+The \Biocpkg{HTSFilter} package allows for a straightforward integration within the \Biocpkg{DESeq2} analysis pipeline, most notably allowing for $p$-values to be adjusted only for those genes passing the filter. Note that \Biocpkg{DESeq2} now impelements an independent filtering procedure by default in the \Rfunction{results} function; this filter is a potential alternative filtering technique and does not need to be used in addition to the one included in \Biocpkg{HTSFilter}. In fact, each filter is targeting the same weakly expressed genes to be filtered from the analysis. As such, if the user wishes to make use of \Biocpkg{HTSFilter} within the \Biocpkg{DESeq2} pipeline, the argument \texttt{independentFiltering=FALSE} should be used when calling the \Rfunction{results} function in \Biocpkg{DESeq2}.
 
-To illustrate the application of a filter for high-throughput sequencing data in the form of a \Rclass{DESeqDataSet} (the class used within the \Rpackage{DESeq2} pipeline for differential analysis), we coerce \Robject{sultan} into an object of the class \Rclass{DESeqDataSet} using the function \Rcode{DESeqDataSetFromMatrix}. Once again, we specify that the number of tested thresholds be only 25 (\Rcode{s.len=25}) rather than the default value of 100 to reduce computation time. For objects in the form of a \Rclass{DESeqDataSet}, the default normalization strategy is \Rcode{"DESeq"}, although alternative normalization strategies may also be used.
+To illustrate the application of a filter for high-throughput sequencing data in the form of a \Rclass{DESeqDataSet} (the class used within the \Biocpkg{DESeq2} pipeline for differential analysis), we coerce \Robject{sultan} into an object of the class \Rclass{DESeqDataSet} using the function \Rcode{DESeqDataSetFromMatrix}. Once again, we specify that the number of tested thresholds be only 25 (\Rcode{s.len=25}) rather than the default value of 100 to reduce computation time. For objects in the form of a \Rclass{DESeqDataSet}, the default normalization strategy is \Rcode{"DESeq"}, although alternative normalization strategies may also be used.
 
-<<cds, fig=FALSE, include=FALSE>>=
+<<cds2, fig=FALSE, include=FALSE, eval=FALSE>>=
 
 dds <- DESeqDataSetFromMatrix(countData = exprs(sultan),
                               colData = data.frame(cell.line = conds),
@@ -249,13 +233,13 @@ head(res)
 
 @
 
-As may be seen above, the filtered data remain an object of class \Rclass{DESeqDataSet}, and subsequent functions from \Rpackage{DESeq2} (such as the results summary function \Rcode{results}) may be called directly upon it.
+The filtered data remain an object of class \Rclass{DESeqDataSet}, and subsequent functions from \Biocpkg{DESeq2} (such as the results summary function \Rcode{results}) may be called directly upon it.
 
 %%--------------------------------------------------
-\section{Alternative normalization using \Rpackage{EDAseq}} \label{sec:EDAseqnorm}
+\section{Alternative normalization using \Biocpkg{EDAseq}} \label{sec:EDAseqnorm}
 %%--------------------------------------------------
 
-As a final example, we illustrate the use of the \Rpackage{HTSFilter} package with an alternative normalization strategy, namely the full quantile normalization method in the \Rpackage{EDASeq} package; such a step may be useful when the TMM or DESeq normalization methods are not appropriate for a given dataset. Once again, we create a new object of the appropriate class with the function \Rfunction{newSeqExpressionSet} and normalize data using the \Rfunction{betweenLaneNormalization} function (with \Rcode{which="full"}) in \Rpackage{EDASeq}.
+As a final example, we illustrate the use of the \Biocpkg{HTSFilter} package with an alternative normalization strategy, namely the full quantile normalization method in the \Biocpkg{EDASeq} package; such a step may be useful when the TMM or DESeq normalization methods are not appropriate for a given dataset. Once again, we create a new object of the appropriate class with the function \Rfunction{newSeqExpressionSet} and normalize data using the \Rfunction{betweenLaneNormalization} function (with \Rcode{which="full"}) in \Biocpkg{EDASeq}.
 
 <<ses2, eval=FALSE>>=
 library(EDASeq)
@@ -267,7 +251,7 @@ ses.norm <- betweenLaneNormalization(ses, which="full")
 Subsequently, \Rfunction{HTSFilter} is applied to the normalized data (again using \Rcode{s.len=25}), and the normalization method is set to \Rcode{norm="none"}. We may then make use of the \Rcode{on} vector in the results, which identifies filtered and unfiltered genes (respectively) with 0 and 1, to identify rows in the original data matrix to be retained.
 
 <<ses3, eval=FALSE>>=
-filter <- HTSFilter(exprs(ses.norm), conds, s.len=25, norm="none", 
+filter <- HTSFilter(counts(ses.norm), conds, s.len=25, norm="none", 
           plot=FALSE)
 head(filter$on)
 table(filter$on)
@@ -280,40 +264,8 @@ table(filter$on)
 sessionInfo()
 @ 
 
-\bibliographystyle{plain}  			% Style BST file
 \bibliography{vignette_refs}    	% Bibliography file (usually '*.bib' ) 
 
 \end{document}
 
 
-
-
-
-%%--------------------------------------------------
-%\section{S4 class \Rclass{SeqExpressionSet} (\Rpackage{EDAseq} package)} \label{sec:ses}
-%%--------------------------------------------------
-%
-%\subsection{Using default normalization methods}
-%
-%To filter high-throughput sequencing data in the form of a \Rclass{SeqExpressionSet} (the class used within the \Rpackage{EDAseq} pipeline for exploratory analysis and normalization), we first create a new object of the appropriate class with the function \Rfunction{newSeqExpressionSet}. We then apply the filter using the \Rfunction{HTSFilter} function, again specifying that the number of tested thresholds be only 25 (\Rcode{s.len=25}) rather than the default value of 100. Note that as it is unspecified, the default normalization method is used for filtering the data, namely the Trimmed Mean of M-values (TMM) method \cite{Robinson2010}. We suppress the plot of the global Jaccard index using \Rcode{plot=FALSE}, as it is identical to that shown in Figure~\ref{fig1}.
-%
-%<<ses>>=
-%ses <- newSeqExpressionSet(counts(pasillaGenes), 
-%       phenoData = phenoData(pasillaGenes))
-%filter <- HTSFilter(ses, conds, s.len=25, plot=FALSE)
-%ses <- filter$filteredData
-%dim(ses)
-%dim(filter$removedData)
-%class(ses)
-%@
-%
-%\begin{figure}[t!]
-%\centering
-%\includegraphics[width = .65\textwidth]{HTSFilter-sesfig.png}
-%\caption{Mean-variance relationship across all seven samples of the \Robject{pasillaGenes} data after data filtering, where the black line corresponds to the Poisson distribution (equal mean and variance) and the red curve is a loess fit. Plot obtained using the \Rfunction{meanVarPlot} function in the \Rpackage{EDASeq} package.\label{fig3}}
-%\end{figure}
-%
-%Note that the filtered data are of the same class as the original data, \Rclass{SeqExpressionSet}; the various commands included in \Rpackage{EDASeq} may now be applied to this object. As an example, we produce a mean-variance plot of the counts across all samples after filtering the data (Figure~\ref{fig3}).
-%<<sesfig, fig = FALSE>>=
-%meanVarPlot(ses, log=T)
-%@

@@ -1,15 +1,14 @@
 Package: HTSFilter
 Type: Package
 Title: Filter replicated high-throughput transcriptome sequencing data
-Version: 1.7.0
-Date: 2013-12-10
+Version: 1.7.1
+Date: 2015-03-04
 Author: Andrea Rau, Melina Gallopin, Gilles Celeux, and Florence
         Jaffrezic
 Maintainer: Andrea Rau <andrea.rau@jouy.inra.fr>
-Depends: methods, Biobase (>= 2.16.0), R (>= 2.10.0)
-Imports: DESeq (>= 1.8.3), edgeR (>= 2.6.12), DESeq2 (>= 1.2.8),
-        GenomicRanges, IRanges
-Suggests: EDASeq (>= 1.2.0)
+Depends: methods, Biobase (>= 2.27.3), R (>= 3.2)
+Imports: DESeq (>= 1.19.0), edgeR (>= 3.9.14), DESeq2 (>= 1.6.3)
+Suggests: EDASeq (>= 2.1.4), BiocStyle
 Description: This package implements a filtering procedure for
         replicated transcriptome sequencing data based on a global
         Jaccard similarity index in order to identify genes with low,
@@ -17,4 +16,4 @@ Description: This package implements a filtering procedure for
         conditions.
 License: Artistic-2.0
 LazyLoad: yes
-biocViews: Sequencing, RNASeq, Preprocessing, DifferentialExpression
+biocViews: Sequencing, RNASeq, Preprocessing, DifferentialExpression, GeneExpression, Normalization
