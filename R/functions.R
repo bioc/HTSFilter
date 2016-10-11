@@ -27,7 +27,7 @@ function(data.norm.perCondition, log.s){
 
 .HTSFilterBackground <- 
 function(data, conds, s.min, s.max, s.len, 
-	loess.span, normalization,  plot, plot.name) {
+	loess.span, normalization,  plot, plot.name,  parallel, BPPARAM) {
 
 	## Sanity checks: replicated data?
 	if(min(table(conds) == 1)) {
@@ -49,12 +49,25 @@ function(data, conds, s.min, s.max, s.len,
 	## Calculate index for each threshold value
 	s.test <- seq(log(s.min), log(s.max), length = s.len)
 	## AR (1/17/2013): use mean rather than sum so max value is 1
-	index <- rowMeans(matrix(mapply(function(condition, s) {
-		.perConditionSimilarityIndex(data.norm.perCondition = data.norm[,which(conds == unique(conds)[condition])], 
-		log.s = s)}, 
-		rep(1:length(unique(conds)), times = length(s.test)), 
-		rep(s.test, each = length(unique(conds)))), ncol = length(unique(conds)), 
-		byrow = TRUE))
+	if(parallel == FALSE) {
+	  index <- rowMeans(matrix(mapply(function(condition, s) {
+	    .perConditionSimilarityIndex(data.norm.perCondition = data.norm[,which(conds == unique(conds)[condition])], 
+	                                 log.s = s)}, 
+	    rep(1:length(unique(conds)), times = length(s.test)), 
+	    rep(s.test, each = length(unique(conds)))), ncol = length(unique(conds)), 
+	    byrow = TRUE))
+	}
+	## AR (10/10/2016): add parallel functionality
+	if(parallel == TRUE) {
+	  tmp <- bpmapply(function(condition, s) {
+	    .perConditionSimilarityIndex(data.norm.perCondition = data.norm[,which(conds == unique(conds)[condition])], 
+	                                 log.s = s)
+	    }, 
+	    rep(1:length(unique(conds)), times = length(s.test)), 
+	    rep(s.test, each = length(unique(conds))), BPPARAM=BPPARAM)
+	  index <- rowMeans(matrix(unlist(tmp), ncol = length(unique(conds)), byrow=TRUE))
+	}
+
 
 	## Choosing s.optimal: Fit a loess curve to data
 	index[which(is.nan(index) == TRUE)] <- NA
@@ -132,7 +145,7 @@ function(data, conds, s.min, s.max, s.len,
 		if(normalization != "TMM") message("Note that TMM normalization is used for rpkm filter.")
 		dge <- DGEList(counts=x)
 		dge <- calcNormFactors(dge)
-		crit <- .rpkmDGEList(dge, length, normalized.lib.sizes=TRUE, log=FALSE, prior.count=0.25)
+		crit <- .rpkmDGEList(dge, gene.length=length, normalized.lib.sizes=TRUE, log=FALSE, prior.count=0.25)
 		if(method == "rpkm.mean") crit <- apply(crit, 1, mean)
 		if(method == "rpkm.sum") crit <- apply(crit, 1, sum)
 		if(method == "rpkm.variance") crit <- apply(crit, 1, var)

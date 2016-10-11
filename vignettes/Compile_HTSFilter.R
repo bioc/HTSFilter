@@ -1,5 +1,5 @@
-setwd("C:/Users/Andrea/Desktop/HTSFilter_dev/vignettes")
+setwd("C:/Users/Andrea/Desktop/HTSFilter_devv/vignettes")
 ## install.packages("SweaveListingUtils")
 library(SweaveListingUtils)
-Sweave("HTSFilter.Rnw")
+Sweave("vignettes/HTSFilter.Rnw")
 

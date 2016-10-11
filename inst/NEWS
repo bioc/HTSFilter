@@ -2,7 +2,20 @@
                 RELEASE HISTORY OF HTSFilter PACKAGE
              ========================================
 
-	CHANGES in HTSFilter VERSION 1.7.1
+		CHANGES in HTSFilter VERSION 1.13.1
+	
+-- Fixed bug in vignette causing error message on dev (related to new
+estimateDisp function in edgeR package)
+-- All documentation now automatically done through Roxygen
+-- Functionality for DESeq pipeline (CountDataSet objects) now deprecated
+-- Add possibility for parallel computing via BiocParallel
+-- Recorrect multiple testing correction of p-values in DESeq2 framework (only
+correct p-values for genes that pass filter) using pAdjustMethod argument in
+HTSFilter and HTSBasicFilter functions
+-- Started adding unit testing framework
+
+
+		CHANGES in HTSFilter VERSION 1.7.1
 	
 -- Minor bug fix for integration in edgeR pipeline
 -- Minor updates in vignette and documentation
@@ -10,28 +23,36 @@
 the mcols and colData functions for use in DESeq2 pipeline instead)
 -- Add BiocStyle to Suggests for vignette style
 
-	CHANGES in HTSFilter VERSION 1.2.1
+		CHANGES in HTSFilter VERSION 1.2.1
 
--- Minor bug fix for integeration in DESeq2 pipeline (which now has automatic independent
+-- Minor bug fix for integeration in DESeq2 pipeline (which now has automatic 
+independent
 filtering available)
+
 -- HTSFilter now accepts data with multi-factor designs for all input types
 
-	CHANGES in HTSFilter VERSION 1.0.1
+
+		CHANGES in HTSFilter VERSION 1.0.1
 	
 -- Updated citation information, minor updates to vignette
+
 -- DESeq2, IRanges, and GenomicRanges added to Imports field, and HTSFilter and HTSFilterBasic 
+
 methods written for objects of with DESeqDataSet signature (from DESeq2 pipeline). 
-Examples illustrating the use of HTSFilter have also been added in the documentation and vignettes.
+Examples 
+illustrating the use of HTSFilter have also been added in the documentation and vignettes.
 -- DESeq and edgeR moved to Imports field (thanks to Denis Laloë for the suggestion)
+
 -- Warning message added when gene ID's are included as a column in the data frame
+
 (thanks to Luc Jouneau for the suggestion)
 
-	CHANGES in HTSFilter VERSION 0.99.3-0.99.8
+		CHANGES in HTSFilter VERSION 0.99.3-0.99.8
 
 -- Fixed minor bugs in HTSBasicFilter function for rpkm calculation
 -- Minor changes to vignette
 
-	CHANGES in HTSFilter VERSION 0.99.2
+		CHANGES in HTSFilter VERSION 0.99.2
 	
 -- Small updates to vignette, fixed small bug in HTSBasicFilter function and doc
 
