@@ -573,6 +573,16 @@ setMethod(
 #' @param length Optional vector of length \emph{n} containing the lengths of each gene in \code{x}; 
 #' optional except in the case of \code{method} = \dQuote{rpkm}
 #' 
+#' @param parallel If \code{FALSE}, no parallelization. If \code{TRUE}, parallel 
+#' execution using BiocParallel (see next argument \code{BPPARAM}). A note on running 
+#' in parallel using BiocParallel: it may be advantageous to remove large, unneeded objects 
+#' from the current R environment before calling the function, as it is possible that R's 
+#' internal garbage collection will copy these files while running on worker nodes.
+#' 
+#' @param BPPARAM Optional parameter object passed internally to \code{bplapply} when 
+#' \code{parallel=TRUE}. If not specified, the parameters last registered with \code{register} 
+#' will be used.
+#' 
 #' @return 
 #' \itemize{
 #'  \item{filteredData }{An object of the same class as \code{x} containing the data that passed the filter}
@@ -619,7 +629,7 @@ setMethod(
   signature = signature(x="CountDataSet"),
   definition = function(x, conds=NA, s.min=1, s.max=200, s.len=100,
                         loess.span=0.3, normalization=c("DESeq","TMM","none"),
-                        plot=TRUE, plot.name=NA)
+                        plot=TRUE, plot.name=NA, parallel=FALSE, BPPARAM=bpparam())
   {
     .Deprecated("HTSFilter", 
                 msg="HTSFilter will soon no longer support CountDataSet objects from the original DESeq package.")
@@ -670,7 +680,8 @@ setMethod(
     ## Run filter
     filter <- .HTSFilterBackground(data=data, conds=conds, s.min=s.min,
                                    s.max=s.max, s.len=s.len, loess.span=loess.span,
-                                   normalization=normalization, plot=plot, plot.name=plot.name)
+                                   normalization=normalization, plot=plot, plot.name=plot.name,
+                                   parallel=parallel, BPPARAM=BPPARAM)
     on <- filter$on
     on.index <- which(on == 1) 
     filteredData <- x[on.index,]

@@ -9,7 +9,8 @@
 \usage{
 \S4method{HTSFilter}{CountDataSet}(x, conds = NA, s.min = 1, s.max = 200,
   s.len = 100, loess.span = 0.3, normalization = c("DESeq", "TMM",
-  "none"), plot = TRUE, plot.name = NA)
+  "none"), plot = TRUE, plot.name = NA, parallel = FALSE,
+  BPPARAM = bpparam())
 
 \S4method{HTSBasicFilter}{CountDataSet}(x, method, cutoff.type = "value",
   cutoff = 10, length = NA, normalization = c("DESeq", "TMM", "none"))
@@ -44,6 +45,16 @@ filtering threshold with superimposed loess curve}
 
 \item{plot.name}{If \code{plot} = \dQuote{TRUE}, the name of the PDF file to be saved to the current working directory.
 If \code{plot.name} = NA, the plot is drawn in the current window}
+
+\item{parallel}{If \code{FALSE}, no parallelization. If \code{TRUE}, parallel 
+execution using BiocParallel (see next argument \code{BPPARAM}). A note on running 
+in parallel using BiocParallel: it may be advantageous to remove large, unneeded objects 
+from the current R environment before calling the function, as it is possible that R's 
+internal garbage collection will copy these files while running on worker nodes.}
+
+\item{BPPARAM}{Optional parameter object passed internally to \code{bplapply} when 
+\code{parallel=TRUE}. If not specified, the parameters last registered with \code{register} 
+will be used.}
 
 \item{method}{Basic filtering method to be used: \dQuote{mean}, \dQuote{sum}, \dQuote{rpkm}, 
 \dQuote{variance}, \dQuote{cpm}, \dQuote{max}, \dQuote{cpm.mean}, \dQuote{cpm.sum}, \dQuote{cpm.variance}, 
