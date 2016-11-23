@@ -2,6 +2,11 @@
                 RELEASE HISTORY OF HTSFilter PACKAGE
              ========================================
 
+		CHANGES in HTSFilter VERSION 1.14.1
+	
+-- Fixed bug for missing parallel option when a CountDataSet is used with
+HTSFilter
+
 		CHANGES in HTSFilter VERSION 1.13.1
 	
 -- Fixed bug in vignette causing error message on dev (related to new
