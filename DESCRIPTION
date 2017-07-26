@@ -1,13 +1,13 @@
 Package: HTSFilter
 Type: Package
 Title: Filter replicated high-throughput transcriptome sequencing data
-Version: 1.17.0
-Date: 2016-11-22
+Version: 1.17.1
+Date: 2017-07-26
 Author: Andrea Rau, Melina Gallopin, Gilles Celeux, and Florence
     Jaffrezic
 Maintainer: Andrea Rau <andrea.rau@jouy.inra.fr>
 Depends:
-    R (>= 3.3.0)
+    R (>= 3.4.0)
 Imports:
     edgeR (>= 3.9.14),
     DESeq2 (>= 1.10.1),
@@ -28,4 +28,4 @@ License: Artistic-2.0
 LazyLoad: yes
 biocViews: Sequencing, RNASeq, Preprocessing, DifferentialExpression,
     GeneExpression, Normalization
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1

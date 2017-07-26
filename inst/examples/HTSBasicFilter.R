@@ -26,6 +26,7 @@ filter <- HTSBasicFilter(dge, method="cpm", cutoff.type=2, cutoff=100)
 ########################################################################
 
 library(DESeq2)
+conds <- gsub(" ", ".", conds)
 dds <- DESeqDataSetFromMatrix(countData = exprs(sultan),
                              colData = data.frame(cell.line = conds),
                                design = ~ cell.line)

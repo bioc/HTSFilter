@@ -6,13 +6,13 @@
 \title{Filter replicated high-throughput transcriptome sequencing data}
 \description{
 This package implements a filtering procedure for replicated
-transcriptome sequencing data based on a global Jaccard similarity index in 
-order to identify genes with low, constant levels of expression across one or 
+transcriptome sequencing data based on a global Jaccard similarity index in
+order to identify genes with low, constant levels of expression across one or
 more experimental conditions.
 }
 \details{
 \tabular{ll}{ Package: \tab HTSFilter\cr Type: \tab Package\cr Version:
-\tab 1.14.1\cr Date: \tab 2016-11-22\cr License: \tab Artistic-2.0 \cr LazyLoad:
+\tab 1.17.1\cr Date: \tab 2017-07-26\cr License: \tab Artistic-2.0 \cr LazyLoad:
 \tab yes\cr }
 }
 \examples{
@@ -45,6 +45,7 @@ et <- HTSFilter(et, DGEList=dge, s.len=25, plot=FALSE)$filteredData
 ########################################################################
 
 library(DESeq2)
+conds <- gsub(" ", ".", conds)
 dds <- DESeqDataSetFromMatrix(countData = exprs(sultan),
                               colData = data.frame(cell.line = conds),
                               design = ~ cell.line)
@@ -55,22 +56,21 @@ dds <- DESeqDataSetFromMatrix(countData = exprs(sultan),
 ## class(filter)
 ## res <- results(filter, independentFiltering=FALSE)
 }
+\references{
+R. Bourgon, R. Gentleman, and W. Huber. (2010) Independent filtering increases detection power for high-
+throughput experiments. \emph{PNAS} \bold{107}(21):9546-9551.
+
+P. Jaccard (1901). Etude comparative de la distribution
+orale dans une portion des Alpes et des Jura.
+\emph{Bulletin de la Societe Vaudoise des Sciences Naturelles}, \bold{37}:547-549.
+
+A. Rau, M. Gallopin, G. Celeux, F. Jaffrezic (2013). Data-based filtering
+for replicated high-throughput transcriptome sequencing experiments. \emph{Bioinformatics},
+doi: 10.1093/bioinformatics/btt350.
+}
 \author{
 Andrea Rau, Melina Gallopin, Gilles Celeux, and Florence Jaffrezic
 
 Maintainer: Andrea Rau <\url{andrea.rau@jouy.inra.fr}>
 }
-\references{
-R. Bourgon, R. Gentleman, and W. Huber. (2010) Independent filtering increases detection power for high-
-throughput experiments. \emph{PNAS} \bold{107}(21):9546-9551.
-
-P. Jaccard (1901). Etude comparative de la distribution 
-orale dans une portion des Alpes et des Jura.
-\emph{Bulletin de la Societe Vaudoise des Sciences Naturelles}, \bold{37}:547-549.
-
-A. Rau, M. Gallopin, G. Celeux, F. Jaffrezic (2013). Data-based filtering 
-for replicated high-throughput transcriptome sequencing experiments. \emph{Bioinformatics}, 
-doi: 10.1093/bioinformatics/btt350.
-}
 \keyword{package}
-

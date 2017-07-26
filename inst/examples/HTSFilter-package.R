@@ -27,6 +27,7 @@ et <- HTSFilter(et, DGEList=dge, s.len=25, plot=FALSE)$filteredData
 ########################################################################
 
 library(DESeq2)
+conds <- gsub(" ", ".", conds)
 dds <- DESeqDataSetFromMatrix(countData = exprs(sultan),
                               colData = data.frame(cell.line = conds),
                               design = ~ cell.line)

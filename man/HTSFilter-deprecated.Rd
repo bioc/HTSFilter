@@ -2,9 +2,10 @@
 % Please edit documentation in R/HTSFilter-methods.R
 \docType{methods}
 \name{HTSFilter-deprecated}
-\alias{HTSBasicFilter,CountDataSet-method}
-\alias{HTSFilter,CountDataSet-method}
 \alias{HTSFilter-deprecated}
+\alias{HTSFilter,CountDataSet-method}
+\alias{HTSBasicFilter,CountDataSet-method}
+\alias{HTSBasicFilter,CountDataSet-method}
 \title{Deprecated functions in package \sQuote{HTSFilter}}
 \usage{
 \S4method{HTSFilter}{CountDataSet}(x, conds = NA, s.min = 1, s.max = 200,
@@ -104,9 +105,6 @@ users should make use of \sQuote{DESeqDataSet} objects from the \sQuote{DESeq2} 
   \item{HTSBasicFilter.CountDataSet: \code{\link{HTSBasicFilter}}} 
 }
 }
-\author{
-Andrea Rau, Melina Gallopin, Gilles Celeux, and Florence Jaffrezic
-}
 \references{
 R. Bourgon, R. Gentleman, and W. Huber. (2010) Independent filtering increases detection power for high-
 throughput experiments. \emph{PNAS} \bold{107}(21):9546-9551.
@@ -119,5 +117,7 @@ A. Rau, M. Gallopin, G. Celeux, F. Jaffrezic (2013). Data-based filtering
 for replicated high-throughput transcriptome sequencing experiments. \emph{Bioinformatics},
 doi: 10.1093/bioinformatics/btt350.
 }
+\author{
+Andrea Rau, Melina Gallopin, Gilles Celeux, and Florence Jaffrezic
+}
 \keyword{methods}
-

@@ -3,13 +3,13 @@
 \docType{methods}
 \name{HTSBasicFilter}
 \alias{HTSBasicFilter}
-\alias{HTSBasicFilter,DESeqDataSet-method}
+\alias{HTSBasicFilter,matrix-method}
+\alias{HTSBasicFilter,data.frame-method}
+\alias{HTSBasicFilter,DGEList-method}
 \alias{HTSBasicFilter,DGEExact-method}
 \alias{HTSBasicFilter,DGEGLM-method}
 \alias{HTSBasicFilter,DGELRT-method}
-\alias{HTSBasicFilter,DGEList-method}
-\alias{HTSBasicFilter,data.frame-method}
-\alias{HTSBasicFilter,matrix-method}
+\alias{HTSBasicFilter,DESeqDataSet-method}
 \title{Implement basic filters for transcriptome sequencing data.}
 \usage{
 HTSBasicFilter(x, ...)
@@ -123,6 +123,7 @@ filter <- HTSBasicFilter(dge, method="cpm", cutoff.type=2, cutoff=100)
 ########################################################################
 
 library(DESeq2)
+conds <- gsub(" ", ".", conds)
 dds <- DESeqDataSetFromMatrix(countData = exprs(sultan),
                              colData = data.frame(cell.line = conds),
                                design = ~ cell.line)
@@ -134,9 +135,6 @@ dds <- DESeqDataSetFromMatrix(countData = exprs(sultan),
 ##	cutoff = 0.4)
 ## res <- results(filter, independentFiltering=FALSE)
 }
-\author{
-Andrea Rau, Melina Gallopin, Gilles Celeux, and Florence Jaffrezic
-}
 \references{
 R. Bourgon, R. Gentleman, and W. Huber. (2010) Independent filtering increases detection power for high-
 throughput experiments. \emph{PNAS} \bold{107}(21):9546-9551.
@@ -145,5 +143,7 @@ A. Rau, M. Gallopin, G. Celeux, F. Jaffrezic (2013). Data-based filtering
 for replicated high-throughput transcriptome sequencing experiments. \emph{Bioinformatics},
 doi: 10.1093/bioinformatics/btt350.
 }
+\author{
+Andrea Rau, Melina Gallopin, Gilles Celeux, and Florence Jaffrezic
+}
 \keyword{methods}
-

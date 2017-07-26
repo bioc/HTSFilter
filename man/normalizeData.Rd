@@ -32,9 +32,6 @@ data("sultan")
 normData <- normalizeData(exprs(sultan), norm="DESeq") 
 
 }
-\author{
-Andrea Rau, Melina Gallopin, Gilles Celeux, and Florence Jaffrezic
-}
 \references{
 S. Anders and W. Huber (2010). Differential expression analysis for sequence count data.
 \emph{Genome Biology}, 11(R106):1-28.
@@ -46,5 +43,7 @@ doi: 10.1093/bioinformatics/btt350.
 M. D. Robinson and A. Oshlack (2010). A scaling normalization method for differential expression
 analysis of RNA-seq data. \emph{Genome Biology}, 11(R25).
 }
+\author{
+Andrea Rau, Melina Gallopin, Gilles Celeux, and Florence Jaffrezic
+}
 \keyword{methods}
-

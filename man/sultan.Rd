@@ -4,7 +4,7 @@
 \name{sultan}
 \alias{sultan}
 \title{RNA-seq data from humans in Sultan et al. (2008)}
-\format{An ExpressionSet named \code{sultan.eset} containing the phenotype data and 
+\format{An ExpressionSet named \code{sultan.eset} containing the phenotype data and
 expression data for the Sultan et al. (2008) experiment. Phenotype data may be
 accessed using the \code{pData} function, and expression data may be accessed
 using the \code{exprs} function.}
@@ -30,8 +30,7 @@ of analysis-ready RNA-seq gene count datasets. BMC Bioinformatics, 12(449), 2011
 
 M. Sultan, M. H. Schulz, H. Richard, A. Magen, A. Klingenhoff, M. Scherf, M. Seifert,
 T. Borodina, A. Soldatov, D. Parkhomchuk, D. Schmidt, S. O'Keefe, S. Haas,
-M. Vingron, H. Lehrach, and M. L. Yaspo. A global view of gene activity and alternative 
+M. Vingron, H. Lehrach, and M. L. Yaspo. A global view of gene activity and alternative
 splicing by deep sequencing of the human transcriptome. Science, 15(5891):956-60, 2008.
 }
 \keyword{datasets}
-

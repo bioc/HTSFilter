@@ -20,7 +20,7 @@ BiocStyle::latex()
 \title{\HTSFilter: Data-based filtering for replicated transcriptome sequencing experiments
 }
 \author{Andrea Rau, M{\'e}lina Gallopin, Gilles Celeux, Florence Jaffr{\'e}zic}
-\date{Modified: October 11, 2016.   Compiled: \today}
+\date{Modified: July 26, 2017.   Compiled: \today}
 \maketitle
 
 <<echo=FALSE>>=
@@ -180,10 +180,11 @@ topTags(lrt)
 
 The \Biocpkg{HTSFilter} package allows for a straightforward integration within the \Biocpkg{DESeq2} analysis pipeline, most notably allowing for $p$-values to be adjusted only for those genes passing the filter. Note that \Biocpkg{DESeq2} now impelements an independent filtering procedure by default in the \Rfunction{results} function; this filter is a potential alternative filtering technique and does not need to be used in addition to the one included in \Biocpkg{HTSFilter}. In fact, each filter is targeting the same weakly expressed genes to be filtered from the analysis. As such, if the user wishes to make use of \Biocpkg{HTSFilter} within the \Biocpkg{DESeq2} pipeline, the argument \texttt{independentFiltering=FALSE} should be used when calling the \Rfunction{results} function in \Biocpkg{DESeq2}.
 
-To illustrate the application of a filter for high-throughput sequencing data in the form of a \Rclass{DESeqDataSet} (the class used within the \Biocpkg{DESeq2} pipeline for differential analysis), we coerce \Robject{sultan} into an object of the class \Rclass{DESeqDataSet} using the function \Rcode{DESeqDataSetFromMatrix}. Once again, we specify that the number of tested thresholds be only 25 (\Rcode{s.len=25}) rather than the default value of 100 to reduce computation time. For objects in the form of a \Rclass{DESeqDataSet}, the default normalization strategy is \Rcode{"DESeq"}, although alternative normalization strategies may also be used.
+To illustrate the application of a filter for high-throughput sequencing data in the form of a \Rclass{DESeqDataSet} (the class used within the \Biocpkg{DESeq2} pipeline for differential analysis), we coerce \Robject{sultan} into an object of the class \Rclass{DESeqDataSet} using the function \Rcode{DESeqDataSetFromMatrix}. Once again, we specify that the number of tested thresholds be only 25 (\Rcode{s.len=25}) rather than the default value of 100 to reduce computation time. For objects in the form of a \Rclass{DESeqDataSet}, the default normalization strategy is \Rcode{"DESeq"}, although alternative normalization strategies may also be used. Note that below we replace the spaces in condition names with "." prior to creating a \Rcode{"DESeqDataSet"} object.
 
 <<cds2, fig=FALSE, include=FALSE, eval=FALSE>>=
 
+conds <- gsub(" ", ".", conds)
 dds <- DESeqDataSetFromMatrix(countData = exprs(sultan),
                               colData = data.frame(cell.line = conds),
                               design = ~ cell.line)

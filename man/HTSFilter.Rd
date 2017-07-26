@@ -3,14 +3,21 @@
 \docType{methods}
 \name{HTSFilter}
 \alias{HTSFilter}
-\alias{HTSFilter,DESeqDataSet-method}
+\alias{HTSFilter-methods}
+\alias{HTSFilter,matrix-method}
+\alias{HTSFilter,data.frame-method}
+\alias{HTSFilter,DGEList-method}
 \alias{HTSFilter,DGEExact-method}
 \alias{HTSFilter,DGEGLM-method}
 \alias{HTSFilter,DGELRT-method}
-\alias{HTSFilter,DGEList-method}
-\alias{HTSFilter,data.frame-method}
+\alias{HTSFilter,DESeqDataSet-method}
 \alias{HTSFilter,matrix-method}
-\alias{HTSFilter-methods}
+\alias{HTSFilter,data.frame-method}
+\alias{HTSFilter,DGEList-method}
+\alias{HTSFilter,DGEExact-method}
+\alias{HTSFilter,DGEGLM-method}
+\alias{HTSFilter,DGELRT-method}
+\alias{HTSFilter,DESeqDataSet-method}
 \title{Calculate data-based filtering threshold for replicated transcriptome sequencing data.}
 \usage{
 HTSFilter(x, ...)
@@ -168,6 +175,7 @@ et <- HTSFilter(et, DGEList=dge, s.len=25, plot=FALSE)$filteredData
 ########################################################################
 
 library(DESeq2)
+conds <- gsub(" ", ".", conds)
 dds <- DESeqDataSetFromMatrix(countData = exprs(sultan),
                               colData = data.frame(cell.line = conds),
                               design = ~ cell.line)
@@ -177,9 +185,6 @@ dds <- DESeqDataSetFromMatrix(countData = exprs(sultan),
 ## filter <- HTSFilter(dds, s.len=25, plot=FALSE)$filteredData
 ## class(filter)
 ## res <- results(filter, independentFiltering=FALSE)
-}
-\author{
-Andrea Rau, Melina Gallopin, Gilles Celeux, and Florence Jaffrezic
 }
 \references{
 R. Bourgon, R. Gentleman, and W. Huber. (2010) Independent filtering increases detection power for high-
@@ -193,5 +198,7 @@ A. Rau, M. Gallopin, G. Celeux, F. Jaffrezic (2013). Data-based filtering
 for replicated high-throughput transcriptome sequencing experiments. \emph{Bioinformatics},
 doi: 10.1093/bioinformatics/btt350.
 }
+\author{
+Andrea Rau, Melina Gallopin, Gilles Celeux, and Florence Jaffrezic
+}
 \keyword{methods}
-
