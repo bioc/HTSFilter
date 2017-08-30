@@ -7,7 +7,6 @@
 
 \usepackage{subfigure}
 \usepackage{amsmath}
-\usepackage{Sweave}
 \newcommand{\HTSFilter}{\Biocpkg{HTSFilter}}
 
 
