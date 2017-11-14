@@ -34,7 +34,8 @@
 #' \code{DGEExact} object, a \code{DGEGLM} object, a \code{DGELRT} object, or a \code{DESeqDataSet} object.
 #' 
 #' @param conds  Vector of length \emph{n} identifying the experimental condition of each of the \emph{n} samples; required when sQuote(x)
-#' is a numeric matrix.
+#' is a numeric matrix. May be optionally used for objects of class \code{DGEList}, 
+#' \code{DGEExact}, \code{DGEGLM}, \code{DGELRT}, or \code{DESeqDataSet}.
 #' 
 #' @param s.min Minimum value of filtering threshold to be considered, with default value equal to 1
 #' 
@@ -150,8 +151,12 @@ setMethod(
                                    normalization=normalization, plot=plot, 
                                    plot.name=plot.name, parallel=parallel, BPPARAM=BPPARAM)
     
+    filteredData <- filter$data.filter
+    if(length(rownames(data))) rownames(filteredData) <- rownames(data)[which(filter$on == 1)]
+    if(length(colnames(data))) colnames(filteredData) <- colnames(data)
+    
     ## Return various results
-    filter.results <- list(filteredData =  filter$data.filter,
+    filter.results <- list(filteredData = filteredData,
                            on = filter$on, s = filter$s.optimal,
                            indexValues = filter$index.values, normFactor = filter$norm.factor,
                            removedData = data[which(filter$on == 0),])
@@ -185,8 +190,13 @@ setMethod(
                                    normalization=normalization, plot=plot, 
                                    plot.name=plot.name, parallel=parallel, BPPARAM=BPPARAM)
     
+    filteredData <- filter$data.filter
+    if(length(rownames(data))) rownames(filteredData) <- rownames(data)[which(filter$on == 1)]
+    if(length(colnames(data))) colnames(filteredData) <- colnames(data)
+    
+    
     ## Return various results
-    filter.results <- list(filteredData =  filter$data.filter,
+    filter.results <- list(filteredData =  filteredData,
                            on = filter$on, s = filter$s.optimal,
                            indexValues = filter$index.values, normFactor = filter$norm.factor,
                            removedData = data[which(filter$on == 0),])
@@ -201,7 +211,7 @@ setMethod(
 setMethod(
   f="HTSFilter",
   signature = signature(x="DGEList"),
-  definition = function(x, s.min=1, s.max=200, s.len=100,
+  definition = function(x, conds=NULL, s.min=1, s.max=200, s.len=100,
                         loess.span=0.3, normalization=c("TMM","DESeq","pseudo.counts","none"),
                         plot=TRUE, plot.name=NA, parallel=FALSE, BPPARAM=bpparam())
   {
@@ -216,7 +226,7 @@ setMethod(
     
     normalization <- match.arg(normalization)
     data <- x$counts
-    conds <- x$samples$group
+    if(!length(conds))  conds <- x$samples$group
     if(normalization == "pseudo.counts") {
       if(is.null(x$pseudo.counts) == TRUE) {
         stop(paste("To use pseudo.counts for filtering, you must first call estimateCommonDisp."))
@@ -271,7 +281,7 @@ setMethod(
 setMethod(
   f="HTSFilter",
   signature = signature(x="DGEExact"),
-  definition = function(x, DGEList, s.min=1, s.max=200, s.len=100,
+  definition = function(x, DGEList, conds=NULL, s.min=1, s.max=200, s.len=100,
                         loess.span=0.3, normalization=c("TMM","DESeq","pseudo.counts","none"),
                         plot=TRUE, plot.name=NA, parallel=FALSE, BPPARAM=bpparam())
   {
@@ -281,7 +291,7 @@ setMethod(
     }
     normalization <- match.arg(normalization)
     data <- DGEList$counts
-    conds <- DGEList$samples$group
+    if(!length(conds)) conds <- DGEList$samples$group
     if(normalization == "pseudo.counts") {
       if(is.null(DGEList$pseudo.counts) == TRUE) {
         stop(paste("To use pseudo.counts for filtering, you must first call estimateCommonDisp."))
@@ -323,7 +333,7 @@ setMethod(
 setMethod(
   f="HTSFilter",
   signature = signature(x="DGEGLM"),
-  definition = function(x, s.min=1, s.max=200, s.len=100,
+  definition = function(x, conds=NULL, s.min=1, s.max=200, s.len=100,
                         loess.span=0.3, normalization=c("TMM","DESeq","none"),
                         plot=TRUE, plot.name=NA, parallel=FALSE, BPPARAM=bpparam())
   {
@@ -333,11 +343,13 @@ setMethod(
     }
     normalization <- match.arg(normalization)
     data <- x$counts
-    conds <- x$design
-    ## Remove intercept if present
-    if(colnames(conds)[1] == "(Intercept)") conds <- conds[,-1]
-    ## Multiple factor designs
-    if(is.null(dim(conds)) == FALSE) conds <- do.call(paste, as.data.frame(conds))
+    if(!length(conds)) {
+      conds <- x$design
+      ## Remove intercept if present
+      if(colnames(conds)[1] == "(Intercept)") conds <- conds[,-1]
+      ## Multiple factor designs
+      if(is.null(dim(conds)) == FALSE) conds <- do.call(paste, as.data.frame(conds))
+    }
     
     ## Run filter
     filter <- .HTSFilterBackground(data=data, conds=conds, s.min=s.min,
@@ -381,7 +393,7 @@ setMethod(
 setMethod(
   f="HTSFilter",
   signature = signature(x="DGELRT"),
-  definition = function(x, DGEGLM, s.min=1, s.max=200, s.len=100,
+  definition = function(x, DGEGLM, conds=NULL, s.min=1, s.max=200, s.len=100,
                         loess.span=0.3, normalization=c("TMM","DESeq","none"),
                         plot=TRUE, plot.name=NA, parallel=FALSE, BPPARAM=bpparam())
   {
@@ -391,11 +403,13 @@ setMethod(
     }
     normalization <- match.arg(normalization)
     data <- DGEGLM$counts
-    conds <- x$design
-    ## Remove intercept if present
-    if(colnames(conds)[1] == "(Intercept)") conds <- conds[,-1]
-    ## Multiple factor designs
-    if(is.null(dim(conds)) == FALSE) conds <- do.call(paste, as.data.frame(conds))
+    if(!length(conds)) {
+      conds <- x$design
+      ## Remove intercept if present
+      if(colnames(conds)[1] == "(Intercept)") conds <- conds[,-1]
+      ## Multiple factor designs
+      if(is.null(dim(conds)) == FALSE) conds <- do.call(paste, as.data.frame(conds))
+    }
     
     ## Run filter
     filter <- .HTSFilterBackground(data=data, conds=conds, s.min=s.min,
@@ -443,7 +457,7 @@ setMethod(
 setMethod(
   f= "HTSFilter",
   signature = signature(x="DESeqDataSet"),
-  definition = function(x, s.min=1, s.max=200, s.len=100, 
+  definition = function(x, conds=NULL, s.min=1, s.max=200, s.len=100, 
                         loess.span=0.3, normalization=c("DESeq", "TMM", "none"), 
                         plot=TRUE, plot.name=NA, pAdjustMethod="BH", 
                         parallel=FALSE, BPPARAM=bpparam()) 
@@ -455,12 +469,26 @@ setMethod(
     normalization <- match.arg(normalization)
     data <- counts(x, normalized=FALSE)
     
-    conds <- x@colData
-    if("sizeFactor" %in% colnames(conds)) {
-      conds <- conds[,-which(colnames(conds) == "sizeFactor")]
-    }		
-    ## Multiple factor designs
-    if(is.null(dim(conds)) == FALSE) conds <- do.call(paste, as.data.frame(conds))
+    ## November 14, 2017: adjust for more complicated designs in DESeq2
+    ## especially when not all columns of colData are used in design
+    ## Thanks to Stephanie Durand for finding this bug!
+    if(!length(conds)) {
+      condsMat <- x@colData
+      des <- x@design
+      desfactors <- strsplit(as.character(x@design)[-1], split=" + ", fixed=TRUE)[[1]]
+      indfactors <- strsplit(as.character(x@design)[-1], split=" * ", fixed=TRUE)[[1]]
+      desfactors <- unique(c(desfactors, indfactors))
+      index <- which(colnames(condsMat) %in% desfactors)
+      condsMat <- condsMat[,index]
+      ## Multiple factor designs
+      if(is.null(dim(condsMat)) == FALSE) condsMat <- do.call(paste, as.data.frame(condsMat))
+      conds <- condsMat
+    }
+    if(min(table(conds)) < 2) {
+      print(table(conds))
+      stop(paste("Watch out! One of the combinations of factors in your design has a single replicate.
+Use the conds argument to specify a condition vector in which all levels are replicated (for instance, a single factor)"))
+    }
     
     ## Run filter
     filter <- .HTSFilterBackground(data=data, conds=conds, s.min=s.min,

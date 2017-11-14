@@ -1,6 +1,13 @@
-﻿            
+            
                 RELEASE HISTORY OF HTSFilter PACKAGE
              ========================================
+
+		CHANGES in HTSFilter VERSION 1.19.2
+
+—- Fixed bug for the DESeqDataSet class when there are additional columns in the
+colData of the object beyond those used in the design (thanks to Stephanie Durand
+for finding the bug!) 
+-- Keep rownames and colnames on filtered data for matrix and data.frame class
 
 		CHANGES in HTSFilter VERSION 1.14.1
 	
