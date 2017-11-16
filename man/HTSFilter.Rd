@@ -35,26 +35,27 @@ HTSFilter(x, ...)
 \S4method{HTSFilter}{DGEList}(x, s.min = 1, s.max = 200, s.len = 100,
   loess.span = 0.3, normalization = c("TMM", "DESeq", "pseudo.counts",
   "none"), plot = TRUE, plot.name = NA, parallel = FALSE,
-  BPPARAM = bpparam())
+  BPPARAM = bpparam(), conds)
 
 \S4method{HTSFilter}{DGEExact}(x, DGEList, s.min = 1, s.max = 200,
   s.len = 100, loess.span = 0.3, normalization = c("TMM", "DESeq",
   "pseudo.counts", "none"), plot = TRUE, plot.name = NA, parallel = FALSE,
-  BPPARAM = bpparam())
+  BPPARAM = bpparam(), conds)
 
 \S4method{HTSFilter}{DGEGLM}(x, s.min = 1, s.max = 200, s.len = 100,
   loess.span = 0.3, normalization = c("TMM", "DESeq", "none"),
-  plot = TRUE, plot.name = NA, parallel = FALSE, BPPARAM = bpparam())
+  plot = TRUE, plot.name = NA, parallel = FALSE, BPPARAM = bpparam(),
+  conds)
 
 \S4method{HTSFilter}{DGELRT}(x, DGEGLM, s.min = 1, s.max = 200,
   s.len = 100, loess.span = 0.3, normalization = c("TMM", "DESeq",
   "none"), plot = TRUE, plot.name = NA, parallel = FALSE,
-  BPPARAM = bpparam())
+  BPPARAM = bpparam(), conds)
 
 \S4method{HTSFilter}{DESeqDataSet}(x, s.min = 1, s.max = 200, s.len = 100,
   loess.span = 0.3, normalization = c("DESeq", "TMM", "none"),
   plot = TRUE, plot.name = NA, pAdjustMethod = "BH", parallel = FALSE,
-  BPPARAM = bpparam())
+  BPPARAM = bpparam(), conds)
 }
 \arguments{
 \item{x}{A numeric matrix or data.frame representing the counts of dimension (\emph{g} x \emph{n}), 
@@ -64,7 +65,8 @@ for \emph{g} genes in \emph{n} samples, a \code{DGEList} object, a
 \item{...}{Additional optional arguments}
 
 \item{conds}{Vector of length \emph{n} identifying the experimental condition of each of the \emph{n} samples; required when sQuote(x)
-is a numeric matrix.}
+is a numeric matrix. In the case of objects of class \code{DGEList}, 
+\code{DGEExact}, \code{DGEGLM}, \code{DGELRT}, or \code{DESeqDataSet}, the design matrix is automatically}
 
 \item{s.min}{Minimum value of filtering threshold to be considered, with default value equal to 1}
 

@@ -15,6 +15,7 @@ BiocStyle::latex()
 @
 
 \begin{document}
+\SweaveOpts{concordance=TRUE}
 
 \title{\HTSFilter: Data-based filtering for replicated transcriptome sequencing experiments
 }

@@ -12,7 +12,7 @@ more experimental conditions.
 }
 \details{
 \tabular{ll}{ Package: \tab HTSFilter\cr Type: \tab Package\cr Version:
-\tab 1.19.2\cr Date: \tab 2017-11-14\cr License: \tab Artistic-2.0 \cr LazyLoad:
+\tab 1.19.3\cr Date: \tab 2017-11-16\cr License: \tab Artistic-2.0 \cr LazyLoad:
 \tab yes\cr }
 }
 \examples{

@@ -34,8 +34,11 @@
 #' \code{DGEExact} object, a \code{DGEGLM} object, a \code{DGELRT} object, or a \code{DESeqDataSet} object.
 #' 
 #' @param conds  Vector of length \emph{n} identifying the experimental condition of each of the \emph{n} samples; required when sQuote(x)
-#' is a numeric matrix. May be optionally used for objects of class \code{DGEList}, 
-#' \code{DGEExact}, \code{DGEGLM}, \code{DGELRT}, or \code{DESeqDataSet}.
+#' is a numeric matrix. In the case of objects of class \code{DGEList}, 
+#' \code{DGEExact}, \code{DGEGLM}, \code{DGELRT}, or \code{DESeqDataSet}, the design matrix is automatically
+#’ detected from the object; if an alternative design should be used, this may optionally be provided.
+#’ Note that in multi-factor designs in which one or more combinations of factors are unreplicated, the bonds
+#’ vector may be used to specify only the primary factor of interest for use in HTSFilter.
 #' 
 #' @param s.min Minimum value of filtering threshold to be considered, with default value equal to 1
 #' 
@@ -211,11 +214,12 @@ setMethod(
 setMethod(
   f="HTSFilter",
   signature = signature(x="DGEList"),
-  definition = function(x, conds=NULL, s.min=1, s.max=200, s.len=100,
+  definition = function(x, s.min=1, s.max=200, s.len=100,
                         loess.span=0.3, normalization=c("TMM","DESeq","pseudo.counts","none"),
-                        plot=TRUE, plot.name=NA, parallel=FALSE, BPPARAM=bpparam())
+                        plot=TRUE, plot.name=NA, parallel=FALSE, BPPARAM=bpparam(), conds)
   {
     
+    if(missing(conds)) conds <- NULL
     if(!require(edgeR)) {
       stop("edgeR library must be installed.")
     }
@@ -281,11 +285,13 @@ setMethod(
 setMethod(
   f="HTSFilter",
   signature = signature(x="DGEExact"),
-  definition = function(x, DGEList, conds=NULL, s.min=1, s.max=200, s.len=100,
+  definition = function(x, DGEList, s.min=1, s.max=200, s.len=100,
                         loess.span=0.3, normalization=c("TMM","DESeq","pseudo.counts","none"),
-                        plot=TRUE, plot.name=NA, parallel=FALSE, BPPARAM=bpparam())
+                        plot=TRUE, plot.name=NA, parallel=FALSE, BPPARAM=bpparam(), conds)
   {
     
+    if(missing(conds)) conds <- NULL
+
     if(!require(edgeR)) {
       stop("edgeR library must be installed.")
     }
@@ -333,11 +339,13 @@ setMethod(
 setMethod(
   f="HTSFilter",
   signature = signature(x="DGEGLM"),
-  definition = function(x, conds=NULL, s.min=1, s.max=200, s.len=100,
+  definition = function(x, s.min=1, s.max=200, s.len=100,
                         loess.span=0.3, normalization=c("TMM","DESeq","none"),
-                        plot=TRUE, plot.name=NA, parallel=FALSE, BPPARAM=bpparam())
+                        plot=TRUE, plot.name=NA, parallel=FALSE, BPPARAM=bpparam(), conds)
   {
     
+    if(missing(conds)) conds <- NULL
+
     if(!require(edgeR)) {
       stop("edgeR library must be installed.")
     }
@@ -393,11 +401,13 @@ setMethod(
 setMethod(
   f="HTSFilter",
   signature = signature(x="DGELRT"),
-  definition = function(x, DGEGLM, conds=NULL, s.min=1, s.max=200, s.len=100,
+  definition = function(x, DGEGLM, s.min=1, s.max=200, s.len=100,
                         loess.span=0.3, normalization=c("TMM","DESeq","none"),
-                        plot=TRUE, plot.name=NA, parallel=FALSE, BPPARAM=bpparam())
+                        plot=TRUE, plot.name=NA, parallel=FALSE, BPPARAM=bpparam(), conds)
   {
     
+    if(missing(conds)) conds <- NULL
+
     if(!require(edgeR)) {
       stop("edgeR library must be installed.")
     }
@@ -457,12 +467,14 @@ setMethod(
 setMethod(
   f= "HTSFilter",
   signature = signature(x="DESeqDataSet"),
-  definition = function(x, conds=NULL, s.min=1, s.max=200, s.len=100, 
+  definition = function(x, s.min=1, s.max=200, s.len=100, 
                         loess.span=0.3, normalization=c("DESeq", "TMM", "none"), 
                         plot=TRUE, plot.name=NA, pAdjustMethod="BH", 
-                        parallel=FALSE, BPPARAM=bpparam()) 
+                        parallel=FALSE, BPPARAM=bpparam(), conds) 
     
   {
+    if(missing(conds)) conds <- NULL
+
     if(!require(DESeq2)) {
       stop("DESeq2 library must be installed.")
     }          

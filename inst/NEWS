@@ -2,7 +2,7 @@
                 RELEASE HISTORY OF HTSFilter PACKAGE
              ========================================
 
-		CHANGES in HTSFilter VERSION 1.19.2
+		CHANGES in HTSFilter VERSION 1.19.3
 
 —- Fixed bug for the DESeqDataSet class when there are additional columns in the
 colData of the object beyond those used in the design (thanks to Stephanie Durand
