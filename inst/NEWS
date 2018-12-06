@@ -2,6 +2,10 @@
                 RELEASE HISTORY OF HTSFilter PACKAGE
              ========================================
 
+		CHANGES in HTSFilter VERSION 1.23.1
+
+-- Add ImmunoOncology to biocViews in DESCRIPTION
+
 		CHANGES in HTSFilter VERSION 1.19.3
 
 —- Fixed bug for the DESeqDataSet class when there are additional columns in the
