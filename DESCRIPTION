@@ -1,7 +1,7 @@
 Package: HTSFilter
 Type: Package
 Title: Filter replicated high-throughput transcriptome sequencing data
-Version: 1.22.0
+Version: 1.22.1
 Date: 2017-11-16
 Author: Andrea Rau, Melina Gallopin, Gilles Celeux, and Florence
     Jaffrezic
@@ -26,6 +26,6 @@ Description: This package implements a filtering procedure for
     conditions.
 License: Artistic-2.0
 LazyLoad: yes
-biocViews: Sequencing, RNASeq, Preprocessing, DifferentialExpression,
+biocViews: ImmunoOncology, Sequencing, RNASeq, Preprocessing, DifferentialExpression,
     GeneExpression, Normalization
 RoxygenNote: 6.0.1
