@@ -6,7 +6,7 @@
 #' more experimental conditions.
 #'
 #' \tabular{ll}{ Package: \tab HTSFilter\cr Type: \tab Package\cr Version:
-#' \tab 1.19.3\cr Date: \tab 2017-11-16\cr License: \tab Artistic-2.0 \cr LazyLoad:
+#' \tab 1.27.1\cr Date: \tab 2020-01-14\cr License: \tab Artistic-2.0 \cr LazyLoad:
 #' \tab yes\cr }
 #'
 #' @name HTSFilter-package
@@ -14,7 +14,7 @@
 #' @docType package
 #' @author Andrea Rau, Melina Gallopin, Gilles Celeux, and Florence Jaffrezic
 #'
-#' Maintainer: Andrea Rau <\url{andrea.rau@inra.fr}>
+#' Maintainer: Andrea Rau <\url{andrea.rau@inrae.fr}>
 #' @references
 #' R. Bourgon, R. Gentleman, and W. Huber. (2010) Independent filtering increases detection power for high-
 #' throughput experiments. \emph{PNAS} \bold{107}(21):9546-9551.

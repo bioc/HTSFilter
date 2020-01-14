@@ -15,10 +15,12 @@
 HTSBasicFilter(x, ...)
 
 \S4method{HTSBasicFilter}{matrix}(x, method, cutoff.type = "value",
-  cutoff = 10, length = NA, normalization = c("TMM", "DESeq", "none"))
+  cutoff = 10, length = NA, normalization = c("TMM", "DESeq",
+  "none"))
 
 \S4method{HTSBasicFilter}{data.frame}(x, method, cutoff.type = "value",
-  cutoff = 10, length = NA, normalization = c("TMM", "DESeq", "none"))
+  cutoff = 10, length = NA, normalization = c("TMM", "DESeq",
+  "none"))
 
 \S4method{HTSBasicFilter}{DGEList}(x, method, cutoff.type = "value",
   cutoff = 10, length = NA, normalization = c("TMM", "DESeq",
@@ -29,14 +31,16 @@ HTSBasicFilter(x, ...)
   "pseudo.counts", "none"))
 
 \S4method{HTSBasicFilter}{DGEGLM}(x, method, cutoff.type = "value",
-  cutoff = 10, length = NA, normalization = c("TMM", "DESeq", "none"))
+  cutoff = 10, length = NA, normalization = c("TMM", "DESeq",
+  "none"))
 
 \S4method{HTSBasicFilter}{DGELRT}(x, method, cutoff.type = "value",
-  cutoff = 10, length = NA, normalization = c("TMM", "DESeq", "none"))
+  cutoff = 10, length = NA, normalization = c("TMM", "DESeq",
+  "none"))
 
 \S4method{HTSBasicFilter}{DESeqDataSet}(x, method, cutoff.type = "value",
-  cutoff = 10, length = NA, normalization = c("DESeq", "TMM", "none"),
-  pAdjustMethod = "BH")
+  cutoff = 10, length = NA, normalization = c("DESeq", "TMM",
+  "none"), pAdjustMethod = "BH")
 }
 \arguments{
 \item{x}{A numeric matrix or data.frame representing the counts of dimension (\emph{g} x \emph{n}), 

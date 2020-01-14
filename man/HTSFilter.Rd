@@ -11,13 +11,6 @@
 \alias{HTSFilter,DGEGLM-method}
 \alias{HTSFilter,DGELRT-method}
 \alias{HTSFilter,DESeqDataSet-method}
-\alias{HTSFilter,matrix-method}
-\alias{HTSFilter,data.frame-method}
-\alias{HTSFilter,DGEList-method}
-\alias{HTSFilter,DGEExact-method}
-\alias{HTSFilter,DGEGLM-method}
-\alias{HTSFilter,DGELRT-method}
-\alias{HTSFilter,DESeqDataSet-method}
 \title{Calculate data-based filtering threshold for replicated transcriptome sequencing data.}
 \usage{
 HTSFilter(x, ...)
@@ -39,23 +32,23 @@ HTSFilter(x, ...)
 
 \S4method{HTSFilter}{DGEExact}(x, DGEList, s.min = 1, s.max = 200,
   s.len = 100, loess.span = 0.3, normalization = c("TMM", "DESeq",
-  "pseudo.counts", "none"), plot = TRUE, plot.name = NA, parallel = FALSE,
-  BPPARAM = bpparam(), conds)
+  "pseudo.counts", "none"), plot = TRUE, plot.name = NA,
+  parallel = FALSE, BPPARAM = bpparam(), conds)
 
 \S4method{HTSFilter}{DGEGLM}(x, s.min = 1, s.max = 200, s.len = 100,
   loess.span = 0.3, normalization = c("TMM", "DESeq", "none"),
-  plot = TRUE, plot.name = NA, parallel = FALSE, BPPARAM = bpparam(),
-  conds)
+  plot = TRUE, plot.name = NA, parallel = FALSE,
+  BPPARAM = bpparam(), conds)
 
 \S4method{HTSFilter}{DGELRT}(x, DGEGLM, s.min = 1, s.max = 200,
   s.len = 100, loess.span = 0.3, normalization = c("TMM", "DESeq",
   "none"), plot = TRUE, plot.name = NA, parallel = FALSE,
   BPPARAM = bpparam(), conds)
 
-\S4method{HTSFilter}{DESeqDataSet}(x, s.min = 1, s.max = 200, s.len = 100,
-  loess.span = 0.3, normalization = c("DESeq", "TMM", "none"),
-  plot = TRUE, plot.name = NA, pAdjustMethod = "BH", parallel = FALSE,
-  BPPARAM = bpparam(), conds)
+\S4method{HTSFilter}{DESeqDataSet}(x, s.min = 1, s.max = 200,
+  s.len = 100, loess.span = 0.3, normalization = c("DESeq", "TMM",
+  "none"), plot = TRUE, plot.name = NA, pAdjustMethod = "BH",
+  parallel = FALSE, BPPARAM = bpparam(), conds)
 }
 \arguments{
 \item{x}{A numeric matrix or data.frame representing the counts of dimension (\emph{g} x \emph{n}), 

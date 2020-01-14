@@ -5,16 +5,16 @@
 \alias{HTSFilter-deprecated}
 \alias{HTSFilter,CountDataSet-method}
 \alias{HTSBasicFilter,CountDataSet-method}
-\alias{HTSBasicFilter,CountDataSet-method}
 \title{Deprecated functions in package \sQuote{HTSFilter}}
 \usage{
-\S4method{HTSFilter}{CountDataSet}(x, conds = NA, s.min = 1, s.max = 200,
-  s.len = 100, loess.span = 0.3, normalization = c("DESeq", "TMM",
-  "none"), plot = TRUE, plot.name = NA, parallel = FALSE,
-  BPPARAM = bpparam())
+\S4method{HTSFilter}{CountDataSet}(x, conds = NA, s.min = 1,
+  s.max = 200, s.len = 100, loess.span = 0.3,
+  normalization = c("DESeq", "TMM", "none"), plot = TRUE,
+  plot.name = NA, parallel = FALSE, BPPARAM = bpparam())
 
 \S4method{HTSBasicFilter}{CountDataSet}(x, method, cutoff.type = "value",
-  cutoff = 10, length = NA, normalization = c("DESeq", "TMM", "none"))
+  cutoff = 10, length = NA, normalization = c("DESeq", "TMM",
+  "none"))
 }
 \arguments{
 \item{x}{A numeric matrix or data.frame representing the counts of dimension (\emph{g} x \emph{n}), 
