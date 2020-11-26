@@ -1,6 +1,12 @@
-            
+
                 RELEASE HISTORY OF HTSFilter PACKAGE
              ========================================
+
+		CHANGES in HTSFilter VERSION 1.31.1
+
+-- Remove all references and functionality related to the
+deprecated DESeq package.
+-- Vignette has been updated to Rmarkdown from Sweave.
 
 		CHANGES in HTSFilter VERSION 1.23.1
 
@@ -10,16 +16,16 @@
 
 —- Fixed bug for the DESeqDataSet class when there are additional columns in the
 colData of the object beyond those used in the design (thanks to Stephanie Durand
-for finding the bug!) 
+for finding the bug!)
 -- Keep rownames and colnames on filtered data for matrix and data.frame class
 
 		CHANGES in HTSFilter VERSION 1.14.1
-	
+
 -- Fixed bug for missing parallel option when a CountDataSet is used with
 HTSFilter
 
 		CHANGES in HTSFilter VERSION 1.13.1
-	
+
 -- Fixed bug in vignette causing error message on dev (related to new
 estimateDisp function in edgeR package)
 -- All documentation now automatically done through Roxygen
@@ -32,7 +38,7 @@ HTSFilter and HTSBasicFilter functions
 
 
 		CHANGES in HTSFilter VERSION 1.7.1
-	
+
 -- Minor bug fix for integration in edgeR pipeline
 -- Minor updates in vignette and documentation
 -- Removed IRanges and GenomicRanges from imports (hard-coded
@@ -41,7 +47,7 @@ the mcols and colData functions for use in DESeq2 pipeline instead)
 
 		CHANGES in HTSFilter VERSION 1.2.1
 
--- Minor bug fix for integeration in DESeq2 pipeline (which now has automatic 
+-- Minor bug fix for integeration in DESeq2 pipeline (which now has automatic
 independent
 filtering available)
 
@@ -49,13 +55,13 @@ filtering available)
 
 
 		CHANGES in HTSFilter VERSION 1.0.1
-	
+
 -- Updated citation information, minor updates to vignette
 
--- DESeq2, IRanges, and GenomicRanges added to Imports field, and HTSFilter and HTSFilterBasic 
+-- DESeq2, IRanges, and GenomicRanges added to Imports field, and HTSFilter and HTSFilterBasic
 
-methods written for objects of with DESeqDataSet signature (from DESeq2 pipeline). 
-Examples 
+methods written for objects of with DESeqDataSet signature (from DESeq2 pipeline).
+Examples
 illustrating the use of HTSFilter have also been added in the documentation and vignettes.
 -- DESeq and edgeR moved to Imports field (thanks to Denis Laloë for the suggestion)
 
@@ -69,7 +75,7 @@ illustrating the use of HTSFilter have also been added in the documentation and 
 -- Minor changes to vignette
 
 		CHANGES in HTSFilter VERSION 0.99.2
-	
+
 -- Small updates to vignette, fixed small bug in HTSBasicFilter function and doc
 
 		CHANGES in HTSFilter VERSION 0.99.1
@@ -93,7 +99,7 @@ DGEGLM, and DGELRT now supported
 		CHANGES in HTSFilter VERSION 0.1.1
 
 -- Some additional documentation about the HTSFilter output
--- Small changes to vignette: typos, name changed to HTSFilter.pdf to 
+-- Small changes to vignette: typos, name changed to HTSFilter.pdf to
    allow calls to vignette("HTSFilter"), added .onAttach function to
    zzz.R to add HTSFilter vignette to Windows toolbar.
 -- Added HTSFilter method for signature "data.frame"

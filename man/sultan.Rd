@@ -4,10 +4,12 @@
 \name{sultan}
 \alias{sultan}
 \title{RNA-seq data from humans in Sultan et al. (2008)}
-\format{An ExpressionSet named \code{sultan.eset} containing the phenotype data and
+\format{
+An ExpressionSet named \code{sultan.eset} containing the phenotype data and
 expression data for the Sultan et al. (2008) experiment. Phenotype data may be
 accessed using the \code{pData} function, and expression data may be accessed
-using the \code{exprs} function.}
+using the \code{exprs} function.
+}
 \source{
 ReCount online resource (http://bowtie-bio.sourceforge.net/recount).
 }
